@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
@@ -23,6 +23,7 @@ export const Route = createFileRoute('/register')({
 
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
@@ -31,11 +32,17 @@ function RegisterPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      auth.signUp.email({
+      await auth.signUp.email({
         name: value.name,
         email: value.email,
         password: value.password,
-        callbackURL: '/tasks',
+      }, {
+        onSuccess: () => {
+          navigate({ to: '/tasks' })
+        },
+        onError: (ctx) => {
+          alert(ctx.error.message || 'Erro ao criar conta')
+        },
       })
     },
     validators: {

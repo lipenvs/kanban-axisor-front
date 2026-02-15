@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
@@ -29,17 +30,15 @@ function LoginPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      auth.signIn.email({
+      await auth.signIn.email({
         email: value.email,
         password: value.password,
-        callbackURL: '/tasks',
       }, {
+        onSuccess: () => {
+          navigate({ to: '/tasks' })
+        },
         onError: (ctx) => {
-          if (ctx.error.message) {
-            alert(ctx.error.message)
-          } else {
-            alert('Erro ao fazer login')
-          }
+          alert(ctx.error.message || 'Erro ao fazer login')
         },
       })
     },
@@ -135,12 +134,12 @@ function LoginPage() {
                         <FieldError errors={field.state.meta.errors} />
                       )}
                       <div className="flex justify-end">
-                        <button
-                          type="button"
+                        <Link
+                          to="/forgot-password"
                           className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-900"
                         >
                           Esqueceu a senha?
-                        </button>
+                        </Link>
                       </div>
                     </Field>
                   )
