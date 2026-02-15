@@ -9,6 +9,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon } from '@/components/icons/google'
 import { LinkedInIcon } from '@/components/icons/linkedin'
+import { auth } from '@/lib/auth'
 
 const loginSchema = z.object({
   email: z.email('Digite um endereço de e-mail válido'),
@@ -28,8 +29,19 @@ function LoginPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      // TODO: integrar com Better-Auth
-      console.log('Login:', value)
+      auth.signIn.email({
+        email: value.email,
+        password: value.password,
+        callbackURL: '/tasks',
+      }, {
+        onError: (ctx) => {
+          if (ctx.error.message) {
+            alert(ctx.error.message)
+          } else {
+            alert('Erro ao fazer login')
+          }
+        },
+      })
     },
     validators: {
       onSubmit: loginSchema,

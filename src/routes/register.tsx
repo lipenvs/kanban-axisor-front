@@ -9,6 +9,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon } from '@/components/icons/google'
 import { LinkedInIcon } from '@/components/icons/linkedin'
+import { auth } from '@/lib/auth'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -30,8 +31,12 @@ function RegisterPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      // TODO: integrar com Better-Auth
-      console.log('Register:', value)
+      auth.signUp.email({
+        name: value.name,
+        email: value.email,
+        password: value.password,
+        callbackURL: '/tasks',
+      })
     },
     validators: {
       onSubmit: registerSchema,
