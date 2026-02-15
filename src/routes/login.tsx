@@ -179,7 +179,7 @@ function LoginPage() {
           <p className="text-center text-sm text-zinc-500">
             Não tem uma conta?{' '}
             <Link
-              to="/login"
+              to="/register"
               className="font-semibold text-zinc-900 transition-colors hover:text-zinc-700"
             >
               Cadastre-se
