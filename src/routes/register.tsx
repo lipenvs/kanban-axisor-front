@@ -38,7 +38,9 @@ function RegisterPage() {
         password: value.password,
       }, {
         onSuccess: () => {
-          navigate({ to: '/tasks' })
+          navigate({
+            to: '/tasks',
+          })
         },
         onError: (ctx) => {
           alert(ctx.error.message || 'Erro ao criar conta')

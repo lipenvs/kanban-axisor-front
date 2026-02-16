@@ -89,7 +89,7 @@ function ForgotPasswordPage() {
             </FieldGroup>
           </form>
 
-          <p className="text-center text-sm text-zinc-500">
+          <div className="text-center text-sm text-zinc-500">
             <Link
               to="/login"
               className="inline-flex items-center justify-center gap-2 font-semibold text-zinc-900 transition-colors hover:text-zinc-700"
@@ -97,7 +97,7 @@ function ForgotPasswordPage() {
               <ArrowLeft className="size-4" />
               Voltar para o login
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>
