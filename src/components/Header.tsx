@@ -7,7 +7,7 @@ import { Input } from './ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
-import { AddProjectDialog } from './AddProjectDialog'
+import { AddProjectDialog } from './dialogs/AddProjectDialog'
 
 export default function Header() {
   const navigate = useNavigate()

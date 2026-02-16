@@ -3,15 +3,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import { useState } from "react";
+import { AddCategoryDialog } from "./dialogs/AddCategoryDialog";
 
 export default function Sidebar() {
   const [showAddCategory, setShowAddCategory] = useState(false);
-  const [newCatName, setNewCatName] = useState("");
-  const [newCatColor, setNewCatColor] = useState("#FF0000");
 
   return (
     <aside
@@ -95,48 +91,7 @@ export default function Sidebar() {
         </ScrollArea>
       </div>
 
-      {/* Add Category Dialog */}
-      <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
-        <DialogContent className="sm:max-w-[360px]">
-          <DialogHeader>
-            <DialogTitle>Nova categoria</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="cat-name">Nome</Label>
-              <Input
-                id="cat-name"
-                value={newCatName}
-                onChange={(e) => setNewCatName(e.target.value)}
-                placeholder="Ex: Marketing"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Cor</Label>
-              <div className="flex gap-2 flex-wrap">
-                {['#FF0000', '#00FF00', '#0000FF'].map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setNewCatColor(color)}
-                    className="w-7 h-7 rounded-full transition-all"
-                    style={{
-                      backgroundColor: color,
-                      outline: newCatColor === color ? `2px solid ${color}` : 'none',
-                      outlineOffset: '2px',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddCategory(false)}>
-              Cancelar
-            </Button>
-            <Button>Adicionar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddCategoryDialog open={showAddCategory} onOpenChange={setShowAddCategory} />
     </aside>
   )
 }
