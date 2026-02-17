@@ -24,8 +24,11 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 import type {
   GetProjects200Item,
+  PostProjectsWithFormData201,
   PostProjectsWithFormDataBodyThree,
+  PostProjectsWithJson201,
   PostProjectsWithJsonBodyOne,
+  PostProjectsWithUrlEncoded201,
   PostProjectsWithUrlEncodedBodyTwo,
   PutProjectsByIdWithFormDataBodyThree,
   PutProjectsByIdWithJsonBodyOne,
@@ -36,7 +39,7 @@ import type {
  * Create a new project
  */
 export type postProjectsWithJsonResponse201 = {
-  data: void
+  data: PostProjectsWithJson201
   status: 201
 }
 
@@ -146,7 +149,7 @@ export const usePostProjectsWithJson = <TError = unknown, TContext = unknown>(
  * Create a new project
  */
 export type postProjectsWithUrlEncodedResponse201 = {
-  data: void
+  data: PostProjectsWithUrlEncoded201
   status: 201
 }
 
@@ -267,7 +270,7 @@ export const usePostProjectsWithUrlEncoded = <
  * Create a new project
  */
 export type postProjectsWithFormDataResponse201 = {
-  data: void
+  data: PostProjectsWithFormData201
   status: 201
 }
 

@@ -8,8 +8,11 @@
 
 export * from './account'
 export * from './getProjects200Item'
+export * from './postProjectsWithFormData201'
 export * from './postProjectsWithFormDataBodyThree'
+export * from './postProjectsWithJson201'
 export * from './postProjectsWithJsonBodyOne'
+export * from './postProjectsWithUrlEncoded201'
 export * from './postProjectsWithUrlEncodedBodyTwo'
 export * from './putProjectsByIdWithFormDataBodyThree'
 export * from './putProjectsByIdWithJsonBodyOne'

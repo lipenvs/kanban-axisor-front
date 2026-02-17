@@ -11,6 +11,7 @@ import { Button } from '../ui/button'
 import { useState } from 'react'
 import { usePostProjectsWithJson, getGetProjectsQueryKey } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 
 interface AddProjectDialogProps {
@@ -24,13 +25,15 @@ export function AddProjectDialog({
 }: AddProjectDialogProps) {
   const [name, setName] = useState('')
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { mutate, isPending } = usePostProjectsWithJson({
     mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
+      onSuccess: (response) => {
         onOpenChange(false)
         setName('')
+        navigate({ to: '/tasks/$projectId', params: { projectId: response.data.id } })
+        queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
       },
     },
   })

@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_auth/tasks/$projectId')({
 function TasksPage() {
   const { projectId } = Route.useParams()
   const queryClient = useQueryClient()
-  const { data: projectsResponse } = useGetProjects()
+  const { data: projectsResponse, isFetching } = useGetProjects()
   const projects = projectsResponse?.data
   const project = projects?.find((p) => p.id === projectId)
 
@@ -31,7 +31,7 @@ function TasksPage() {
     },
   })
 
-  if (projects && !project) {
+  if (projects && !project && !isFetching) {
     return <Navigate to="/tasks" replace />
   }
 

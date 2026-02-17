@@ -30,7 +30,7 @@ function TasksIndexPage() {
       <FolderPlus className="w-16 h-16 text-muted-foreground/50" />
       <div>
         <h2 className="text-xl font-semibold text-foreground mb-1">
-          Nenhum projeto selecionado
+          Nenhum projeto cadastrado
         </h2>
         <p className="text-muted-foreground">
           Crie um novo projeto para começar.
