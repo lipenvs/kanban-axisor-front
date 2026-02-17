@@ -86,7 +86,7 @@ export default function Sidebar() {
 
       <Separator />
 
-      <div className="p-4">
+      <div className="p-4 flex-1 flex flex-col min-h-0">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Etiquetas
@@ -100,7 +100,7 @@ export default function Sidebar() {
             <Plus className="w-3.5 h-3.5" />
           </Button>
         </div>
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="space-y-1">
             {labels.map((cat) => (
               <div
