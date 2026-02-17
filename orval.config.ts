@@ -9,6 +9,12 @@ export default defineConfig({
       client: 'react-query',
       clean: true,
       biome: true,
+      baseUrl: 'http://localhost:3333',
+      override: {
+        requestOptions: {
+          credentials: 'include',
+        },
+      },
     },
     input: {
       target: 'http://localhost:3333/openapi/json',

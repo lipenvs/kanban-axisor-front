@@ -45,7 +45,7 @@ export type postProjectsWithJsonResponseSuccess =
 export type postProjectsWithJsonResponse = postProjectsWithJsonResponseSuccess
 
 export const getPostProjectsWithJsonUrl = () => {
-  return `/projects`
+  return `http://localhost:3333/projects`
 }
 
 export const postProjectsWithJson = async (
@@ -53,6 +53,7 @@ export const postProjectsWithJson = async (
   options?: RequestInit,
 ): Promise<postProjectsWithJsonResponse> => {
   const res = await fetch(getPostProjectsWithJsonUrl(), {
+    credentials: 'include',
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -155,7 +156,7 @@ export type postProjectsWithUrlEncodedResponse =
   postProjectsWithUrlEncodedResponseSuccess
 
 export const getPostProjectsWithUrlEncodedUrl = () => {
-  return `/projects`
+  return `http://localhost:3333/projects`
 }
 
 export const postProjectsWithUrlEncoded = async (
@@ -166,6 +167,7 @@ export const postProjectsWithUrlEncoded = async (
   formUrlEncoded.append(`name`, postProjectsWithUrlEncodedBodyTwo.name)
 
   const res = await fetch(getPostProjectsWithUrlEncodedUrl(), {
+    credentials: 'include',
     ...options,
     method: 'POST',
     headers: {
@@ -275,7 +277,7 @@ export type postProjectsWithFormDataResponse =
   postProjectsWithFormDataResponseSuccess
 
 export const getPostProjectsWithFormDataUrl = () => {
-  return `/projects`
+  return `http://localhost:3333/projects`
 }
 
 export const postProjectsWithFormData = async (
@@ -286,6 +288,7 @@ export const postProjectsWithFormData = async (
   formData.append(`name`, postProjectsWithFormDataBodyThree.name)
 
   const res = await fetch(getPostProjectsWithFormDataUrl(), {
+    credentials: 'include',
     ...options,
     method: 'POST',
     body: formData,
@@ -389,13 +392,14 @@ export type getProjectsResponseSuccess = getProjectsResponse200 & {
 export type getProjectsResponse = getProjectsResponseSuccess
 
 export const getGetProjectsUrl = () => {
-  return `/projects`
+  return `http://localhost:3333/projects`
 }
 
 export const getProjects = async (
   options?: RequestInit,
 ): Promise<getProjectsResponse> => {
   const res = await fetch(getGetProjectsUrl(), {
+    credentials: 'include',
     ...options,
     method: 'GET',
   })
@@ -411,7 +415,7 @@ export const getProjects = async (
 }
 
 export const getGetProjectsQueryKey = () => {
-  return [`/projects`] as const
+  return [`http://localhost:3333/projects`] as const
 }
 
 export const getGetProjectsQueryOptions = <

@@ -13,9 +13,16 @@ import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
 import { AddCategoryDialog } from './dialogs/AddCategoryDialog'
+import { AddProjectDialog } from './dialogs/AddProjectDialog'
+import { useGetProjects } from '@/lib/api/generated'
 
 export default function Sidebar() {
   const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showAddProject, setShowAddProject] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<string>('')
+
+  const { data: projectsResponse } = useGetProjects()
+  const projects = projectsResponse?.data ?? []
 
   return (
     <aside
@@ -33,21 +40,34 @@ export default function Sidebar() {
       </div>
 
       <div className="px-4 pb-6">
-        <Select value="1" onValueChange={() => {}}>
+        <Select
+          value={selectedProject}
+          onValueChange={(val) => {
+            if (val === 'new_project') {
+              setShowAddProject(true)
+            } else {
+              setSelectedProject(val)
+            }
+          }}
+        >
           <SelectTrigger className="w-full bg-muted/50 border-border/50 h-10">
             <SelectValue placeholder="Selecionar projeto" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Projetos</SelectLabel>
-              {[
-                { id: '1', name: 'Projeto 1' },
-                { id: '2', name: 'Projeto 2' },
-              ].map((p) => (
+              {projects.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
                 </SelectItem>
               ))}
+              <Separator className="my-2" />
+              <SelectItem value="new_project" className="text-primary font-medium focus:text-primary cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Criar novo projeto
+                </div>
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -109,6 +129,10 @@ export default function Sidebar() {
       <AddCategoryDialog
         open={showAddCategory}
         onOpenChange={setShowAddCategory}
+      />
+      <AddProjectDialog
+        open={showAddProject}
+        onOpenChange={setShowAddProject}
       />
     </aside>
   )
