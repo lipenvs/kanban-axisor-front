@@ -13,13 +13,14 @@ import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
 import { AddCategoryDialog } from './dialogs/AddCategoryDialog'
-import { AddProjectDialog } from './dialogs/AddProjectDialog'
 import { useGetProjects } from '@/lib/api/generated'
+import { useNavigate, useParams } from '@tanstack/react-router'
 
 export default function Sidebar() {
   const [showAddCategory, setShowAddCategory] = useState(false)
-  const [showAddProject, setShowAddProject] = useState(false)
-  const [selectedProject, setSelectedProject] = useState<string>('')
+  const navigate = useNavigate()
+  const params = useParams({ strict: false }) as { projectId?: string }
+  const selectedProjectId = params.projectId
 
   const { data: projectsResponse } = useGetProjects()
   const projects = projectsResponse?.data ?? []
@@ -41,13 +42,9 @@ export default function Sidebar() {
 
       <div className="px-4 pb-6">
         <Select
-          value={selectedProject}
+          value={selectedProjectId ?? undefined}
           onValueChange={(val) => {
-            if (val === 'new_project') {
-              setShowAddProject(true)
-            } else {
-              setSelectedProject(val)
-            }
+            navigate({ to: '/tasks/$projectId', params: { projectId: val } })
           }}
         >
           <SelectTrigger className="w-full bg-muted/50 border-border/50 h-10">
@@ -61,13 +58,6 @@ export default function Sidebar() {
                   {p.name}
                 </SelectItem>
               ))}
-              <Separator className="my-2" />
-              <SelectItem value="new_project" className="text-primary font-medium focus:text-primary cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  Criar novo projeto
-                </div>
-              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -129,10 +119,6 @@ export default function Sidebar() {
       <AddCategoryDialog
         open={showAddCategory}
         onOpenChange={setShowAddCategory}
-      />
-      <AddProjectDialog
-        open={showAddProject}
-        onOpenChange={setShowAddProject}
       />
     </aside>
   )

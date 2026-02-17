@@ -14,7 +14,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthTasksRouteImport } from './routes/_auth.tasks'
+import { Route as AuthTasksIndexRouteImport } from './routes/_auth.tasks.index'
+import { Route as AuthTasksProjectIdRouteImport } from './routes/_auth.tasks.$projectId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -40,9 +41,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthTasksRoute = AuthTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const AuthTasksIndexRoute = AuthTasksIndexRouteImport.update({
+  id: '/tasks/',
+  path: '/tasks/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTasksProjectIdRoute = AuthTasksProjectIdRouteImport.update({
+  id: '/tasks/$projectId',
+  path: '/tasks/$projectId',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -51,14 +57,16 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/tasks': typeof AuthTasksRoute
+  '/tasks/$projectId': typeof AuthTasksProjectIdRoute
+  '/tasks/': typeof AuthTasksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/tasks': typeof AuthTasksRoute
+  '/tasks/$projectId': typeof AuthTasksProjectIdRoute
+  '/tasks': typeof AuthTasksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,13 +75,26 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_auth/tasks': typeof AuthTasksRoute
+  '/_auth/tasks/$projectId': typeof AuthTasksProjectIdRoute
+  '/_auth/tasks/': typeof AuthTasksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forgot-password' | '/login' | '/register' | '/tasks'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/tasks/$projectId'
+    | '/tasks/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/forgot-password' | '/login' | '/register' | '/tasks'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/tasks/$projectId'
+    | '/tasks'
   id:
     | '__root__'
     | '/'
@@ -81,7 +102,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
-    | '/_auth/tasks'
+    | '/_auth/tasks/$projectId'
+    | '/_auth/tasks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,22 +151,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/tasks': {
-      id: '/_auth/tasks'
+    '/_auth/tasks/': {
+      id: '/_auth/tasks/'
       path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthTasksRouteImport
+      fullPath: '/tasks/'
+      preLoaderRoute: typeof AuthTasksIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/tasks/$projectId': {
+      id: '/_auth/tasks/$projectId'
+      path: '/tasks/$projectId'
+      fullPath: '/tasks/$projectId'
+      preLoaderRoute: typeof AuthTasksProjectIdRouteImport
       parentRoute: typeof AuthRoute
     }
   }
 }
 
 interface AuthRouteChildren {
-  AuthTasksRoute: typeof AuthTasksRoute
+  AuthTasksProjectIdRoute: typeof AuthTasksProjectIdRoute
+  AuthTasksIndexRoute: typeof AuthTasksIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthTasksRoute: AuthTasksRoute,
+  AuthTasksProjectIdRoute: AuthTasksProjectIdRoute,
+  AuthTasksIndexRoute: AuthTasksIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
