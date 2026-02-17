@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DeleteProjectDialog } from '@/components/dialogs/DeleteProjectDialog'
-import { useGetProjects } from '@/lib/api/generated'
+import { useGetProjects, usePutProjectsByIdWithJson, getGetProjectsQueryKey } from '@/lib/api/generated'
 import { createFileRoute } from '@tanstack/react-router'
-import { Check, Pencil, Trash2, X } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/_auth/tasks/$projectId')({
 
 function TasksPage() {
   const { projectId } = Route.useParams()
+  const queryClient = useQueryClient()
   const { data: projectsResponse } = useGetProjects()
   const project = projectsResponse?.data?.find((p) => p.id === projectId)
 
@@ -19,7 +21,24 @@ function TasksPage() {
   const [nameValue, setNameValue] = useState('')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
+  const { mutate: updateProject, isPending: isUpdating } = usePutProjectsByIdWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
+        setEditingName(false)
+      },
+    },
+  })
+
   const projectName = project?.name ?? ''
+
+  const handleUpdateName = () => {
+    if (!nameValue.trim() || nameValue === projectName) {
+      setEditingName(false)
+      return
+    }
+    updateProject({ id: projectId, data: { name: nameValue } })
+  }
 
   return (
     <div>
@@ -31,16 +50,28 @@ function TasksPage() {
                 className="text-2xl font-bold h-10 w-72"
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleUpdateName()
+                  if (e.key === 'Escape') setEditingName(false)
+                }}
                 autoFocus
+                disabled={isUpdating}
               />
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Check className="w-4 h-4" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleUpdateName}
+                disabled={isUpdating}
+              >
+                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
                 onClick={() => setEditingName(false)}
+                disabled={isUpdating}
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -73,6 +104,7 @@ function TasksPage() {
       </div>
 
       <DeleteProjectDialog
+        projectId={projectId}
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         projectName={projectName}

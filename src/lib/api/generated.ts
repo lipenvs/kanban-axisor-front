@@ -27,6 +27,9 @@ import type {
   PostProjectsWithFormDataBodyThree,
   PostProjectsWithJsonBodyOne,
   PostProjectsWithUrlEncodedBodyTwo,
+  PutProjectsByIdWithFormDataBodyThree,
+  PutProjectsByIdWithJsonBodyOne,
+  PutProjectsByIdWithUrlEncodedBodyTwo,
 } from './model'
 
 /**
@@ -528,4 +531,462 @@ export function useGetProjects<
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 
   return { ...query, queryKey: queryOptions.queryKey }
+}
+
+/**
+ * Delete project
+ */
+export type deleteProjectsByIdResponse200 = {
+  data: void
+  status: 200
+}
+
+export type deleteProjectsByIdResponseSuccess =
+  deleteProjectsByIdResponse200 & {
+    headers: Headers
+  }
+
+export type deleteProjectsByIdResponse = deleteProjectsByIdResponseSuccess
+
+export const getDeleteProjectsByIdUrl = (id: string) => {
+  return `http://localhost:3333/projects/${id}`
+}
+
+export const deleteProjectsById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteProjectsByIdResponse> => {
+  const res = await fetch(getDeleteProjectsByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'DELETE',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: deleteProjectsByIdResponse['data'] = body ? JSON.parse(body) : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteProjectsByIdResponse
+}
+
+export const getDeleteProjectsByIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteProjectsById>>,
+    TError,
+    { id: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteProjectsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteProjectsById']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteProjectsById>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {}
+
+    return deleteProjectsById(id, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteProjectsByIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteProjectsById>>
+>
+
+export type DeleteProjectsByIdMutationError = unknown
+
+export const useDeleteProjectsById = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteProjectsById>>,
+      TError,
+      { id: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteProjectsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteProjectsByIdMutationOptions(options), queryClient)
+}
+
+/**
+ * Update a project
+ */
+export type putProjectsByIdWithJsonResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putProjectsByIdWithJsonResponseSuccess =
+  putProjectsByIdWithJsonResponse200 & {
+    headers: Headers
+  }
+
+export type putProjectsByIdWithJsonResponse =
+  putProjectsByIdWithJsonResponseSuccess
+
+export const getPutProjectsByIdWithJsonUrl = (id: string) => {
+  return `http://localhost:3333/projects/${id}`
+}
+
+export const putProjectsByIdWithJson = async (
+  id: string,
+  putProjectsByIdWithJsonBodyOne: PutProjectsByIdWithJsonBodyOne,
+  options?: RequestInit,
+): Promise<putProjectsByIdWithJsonResponse> => {
+  const res = await fetch(getPutProjectsByIdWithJsonUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(putProjectsByIdWithJsonBodyOne),
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putProjectsByIdWithJsonResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putProjectsByIdWithJsonResponse
+}
+
+export const getPutProjectsByIdWithJsonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putProjectsByIdWithJson>>,
+    TError,
+    { id: string; data: PutProjectsByIdWithJsonBodyOne },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putProjectsByIdWithJson>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithJsonBodyOne },
+  TContext
+> => {
+  const mutationKey = ['putProjectsByIdWithJson']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putProjectsByIdWithJson>>,
+    { id: string; data: PutProjectsByIdWithJsonBodyOne }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putProjectsByIdWithJson(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutProjectsByIdWithJsonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putProjectsByIdWithJson>>
+>
+export type PutProjectsByIdWithJsonMutationBody = PutProjectsByIdWithJsonBodyOne
+export type PutProjectsByIdWithJsonMutationError = unknown
+
+export const usePutProjectsByIdWithJson = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putProjectsByIdWithJson>>,
+      TError,
+      { id: string; data: PutProjectsByIdWithJsonBodyOne },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putProjectsByIdWithJson>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithJsonBodyOne },
+  TContext
+> => {
+  return useMutation(
+    getPutProjectsByIdWithJsonMutationOptions(options),
+    queryClient,
+  )
+}
+
+/**
+ * Update a project
+ */
+export type putProjectsByIdWithUrlEncodedResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putProjectsByIdWithUrlEncodedResponseSuccess =
+  putProjectsByIdWithUrlEncodedResponse200 & {
+    headers: Headers
+  }
+
+export type putProjectsByIdWithUrlEncodedResponse =
+  putProjectsByIdWithUrlEncodedResponseSuccess
+
+export const getPutProjectsByIdWithUrlEncodedUrl = (id: string) => {
+  return `http://localhost:3333/projects/${id}`
+}
+
+export const putProjectsByIdWithUrlEncoded = async (
+  id: string,
+  putProjectsByIdWithUrlEncodedBodyTwo: PutProjectsByIdWithUrlEncodedBodyTwo,
+  options?: RequestInit,
+): Promise<putProjectsByIdWithUrlEncodedResponse> => {
+  const formUrlEncoded = new URLSearchParams()
+  formUrlEncoded.append(`name`, putProjectsByIdWithUrlEncodedBodyTwo.name)
+
+  const res = await fetch(getPutProjectsByIdWithUrlEncodedUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...options?.headers,
+    },
+    body: formUrlEncoded,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putProjectsByIdWithUrlEncodedResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putProjectsByIdWithUrlEncodedResponse
+}
+
+export const getPutProjectsByIdWithUrlEncodedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>,
+    TError,
+    { id: string; data: PutProjectsByIdWithUrlEncodedBodyTwo },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  const mutationKey = ['putProjectsByIdWithUrlEncoded']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>,
+    { id: string; data: PutProjectsByIdWithUrlEncodedBodyTwo }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putProjectsByIdWithUrlEncoded(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutProjectsByIdWithUrlEncodedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>
+>
+export type PutProjectsByIdWithUrlEncodedMutationBody =
+  PutProjectsByIdWithUrlEncodedBodyTwo
+export type PutProjectsByIdWithUrlEncodedMutationError = unknown
+
+export const usePutProjectsByIdWithUrlEncoded = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>,
+      TError,
+      { id: string; data: PutProjectsByIdWithUrlEncodedBodyTwo },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putProjectsByIdWithUrlEncoded>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  return useMutation(
+    getPutProjectsByIdWithUrlEncodedMutationOptions(options),
+    queryClient,
+  )
+}
+
+/**
+ * Update a project
+ */
+export type putProjectsByIdWithFormDataResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putProjectsByIdWithFormDataResponseSuccess =
+  putProjectsByIdWithFormDataResponse200 & {
+    headers: Headers
+  }
+
+export type putProjectsByIdWithFormDataResponse =
+  putProjectsByIdWithFormDataResponseSuccess
+
+export const getPutProjectsByIdWithFormDataUrl = (id: string) => {
+  return `http://localhost:3333/projects/${id}`
+}
+
+export const putProjectsByIdWithFormData = async (
+  id: string,
+  putProjectsByIdWithFormDataBodyThree: PutProjectsByIdWithFormDataBodyThree,
+  options?: RequestInit,
+): Promise<putProjectsByIdWithFormDataResponse> => {
+  const formData = new FormData()
+  formData.append(`name`, putProjectsByIdWithFormDataBodyThree.name)
+
+  const res = await fetch(getPutProjectsByIdWithFormDataUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    body: formData,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putProjectsByIdWithFormDataResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putProjectsByIdWithFormDataResponse
+}
+
+export const getPutProjectsByIdWithFormDataMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putProjectsByIdWithFormData>>,
+    TError,
+    { id: string; data: PutProjectsByIdWithFormDataBodyThree },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putProjectsByIdWithFormData>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithFormDataBodyThree },
+  TContext
+> => {
+  const mutationKey = ['putProjectsByIdWithFormData']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putProjectsByIdWithFormData>>,
+    { id: string; data: PutProjectsByIdWithFormDataBodyThree }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putProjectsByIdWithFormData(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutProjectsByIdWithFormDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putProjectsByIdWithFormData>>
+>
+export type PutProjectsByIdWithFormDataMutationBody =
+  PutProjectsByIdWithFormDataBodyThree
+export type PutProjectsByIdWithFormDataMutationError = unknown
+
+export const usePutProjectsByIdWithFormData = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putProjectsByIdWithFormData>>,
+      TError,
+      { id: string; data: PutProjectsByIdWithFormDataBodyThree },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putProjectsByIdWithFormData>>,
+  TError,
+  { id: string; data: PutProjectsByIdWithFormDataBodyThree },
+  TContext
+> => {
+  return useMutation(
+    getPutProjectsByIdWithFormDataMutationOptions(options),
+    queryClient,
+  )
 }
