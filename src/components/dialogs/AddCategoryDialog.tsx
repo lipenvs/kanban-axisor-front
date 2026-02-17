@@ -10,6 +10,11 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 
+const CATEGORY_COLORS = [
+  '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B',
+  '#EC4899', '#06B6D4', '#84CC16',
+]
+
 interface AddCategoryDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -41,7 +46,7 @@ export function AddCategoryDialog({
           <div className="space-y-2">
             <Label>Cor</Label>
             <div className="flex gap-2 flex-wrap">
-              {['#FF0000', '#00FF00', '#0000FF'].map((color) => (
+              {CATEGORY_COLORS.map((color) => (
                 <button
                   key={color}
                   onClick={() => setNewCatColor(color)}
