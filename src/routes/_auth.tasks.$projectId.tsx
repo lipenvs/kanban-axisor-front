@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DeleteProjectDialog } from '@/components/dialogs/DeleteProjectDialog'
 import { useGetProjects, usePutProjectsByIdWithJson, getGetProjectsQueryKey } from '@/lib/api/generated'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
@@ -15,7 +15,8 @@ function TasksPage() {
   const { projectId } = Route.useParams()
   const queryClient = useQueryClient()
   const { data: projectsResponse } = useGetProjects()
-  const project = projectsResponse?.data?.find((p) => p.id === projectId)
+  const projects = projectsResponse?.data
+  const project = projects?.find((p) => p.id === projectId)
 
   const [editingName, setEditingName] = useState(false)
   const [nameValue, setNameValue] = useState('')
@@ -29,6 +30,10 @@ function TasksPage() {
       },
     },
   })
+
+  if (projects && !project) {
+    return <Navigate to="/tasks" replace />
+  }
 
   const projectName = project?.name ?? ''
 

@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { AddProjectDialog } from '@/components/dialogs/AddProjectDialog'
 import { useGetProjects } from '@/lib/api/generated'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
@@ -37,10 +36,6 @@ function TasksIndexPage() {
           Crie um novo projeto para começar.
         </p>
       </div>
-      <Button onClick={() => setShowAddProject(true)}>
-        <FolderPlus className="w-4 h-4 mr-2" />
-        Criar novo projeto
-      </Button>
       <AddProjectDialog
         open={showAddProject}
         onOpenChange={setShowAddProject}

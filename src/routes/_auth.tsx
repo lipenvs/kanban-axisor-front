@@ -17,6 +17,7 @@ function AuthLayout() {
       if (!response.data?.session) {
         throw redirect({ to: '/login' })
       }
+      return response.data
     },
   })
 
