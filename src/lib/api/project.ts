@@ -144,7 +144,6 @@ export const usePostProjectsWithJson = <TError = unknown, TContext = unknown>(
     queryClient,
   )
 }
-
 /**
  * Create a new project
  */
@@ -265,7 +264,6 @@ export const usePostProjectsWithUrlEncoded = <
     queryClient,
   )
 }
-
 /**
  * Create a new project
  */
@@ -382,7 +380,6 @@ export const usePostProjectsWithFormData = <
     queryClient,
   )
 }
-
 /**
  * Get all projects
  */
@@ -638,7 +635,6 @@ export const useDeleteProjectsById = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getDeleteProjectsByIdMutationOptions(options), queryClient)
 }
-
 /**
  * Update a project
  */
@@ -753,7 +749,6 @@ export const usePutProjectsByIdWithJson = <
     queryClient,
   )
 }
-
 /**
  * Update a project
  */
@@ -875,7 +870,6 @@ export const usePutProjectsByIdWithUrlEncoded = <
     queryClient,
   )
 }
-
 /**
  * Update a project
  */

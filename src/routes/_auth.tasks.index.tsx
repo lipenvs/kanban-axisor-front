@@ -1,8 +1,8 @@
 import { AddProjectDialog } from '@/components/dialogs/AddProjectDialog'
-import { useGetProjects } from '@/lib/api/generated'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { FolderPlus } from 'lucide-react'
 import { useState } from 'react'
+import { useGetProjects } from '@/lib/api/project'
 
 export const Route = createFileRoute('/_auth/tasks/')({
   component: TasksIndexPage,

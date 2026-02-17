@@ -9,10 +9,10 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useState } from 'react'
-import { usePostProjectsWithJson, getGetProjectsQueryKey } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
+import { getGetProjectsQueryKey, usePostProjectsWithJson } from '@/lib/api/project'
 
 interface AddProjectDialogProps {
   open: boolean

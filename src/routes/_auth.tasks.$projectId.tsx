@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DeleteProjectDialog } from '@/components/dialogs/DeleteProjectDialog'
-import { useGetProjects, usePutProjectsByIdWithJson, getGetProjectsQueryKey } from '@/lib/api/generated'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
+import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson } from '@/lib/api/project'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
   component: TasksPage,

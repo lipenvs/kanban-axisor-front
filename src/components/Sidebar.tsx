@@ -13,8 +13,8 @@ import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
 import { AddCategoryDialog } from './dialogs/AddCategoryDialog'
-import { useGetProjects } from '@/lib/api/generated'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useGetProjects } from '@/lib/api/project'
 
 export default function Sidebar() {
   const [showAddCategory, setShowAddCategory] = useState(false)
