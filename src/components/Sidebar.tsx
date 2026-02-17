@@ -23,7 +23,7 @@ export default function Sidebar() {
   const selectedProjectId = params.projectId
 
   const { data: projectsResponse } = useGetProjects()
-  const projects = projectsResponse?.data ?? []
+  const projects = projectsResponse?.data?.projects ?? []
 
   return (
     <aside

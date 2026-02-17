@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_auth/tasks/')({
 function TasksIndexPage() {
   const [showAddProject, setShowAddProject] = useState(false)
   const { data: projectsResponse, isLoading } = useGetProjects()
-  const projects = projectsResponse?.data ?? []
+  const projects = projectsResponse?.data.projects ?? []
 
   if (isLoading) return null
 

@@ -15,7 +15,7 @@ function TasksPage() {
   const { projectId } = Route.useParams()
   const queryClient = useQueryClient()
   const { data: projectsResponse, isFetching } = useGetProjects()
-  const projects = projectsResponse?.data
+  const projects = projectsResponse?.data.projects
   const project = projects?.find((p) => p.id === projectId)
 
   const [editingName, setEditingName] = useState(false)
