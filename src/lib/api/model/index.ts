@@ -7,9 +7,18 @@
  */
 
 export * from './account'
+export * from './getLabelsByProjectId200'
+export * from './getLabelsByProjectId200LabelsItem'
+export * from './getLabelsByProjectIdParams'
 export * from './getProjects200'
 export * from './getProjects200ProjectsItem'
 export * from './getProjectsParams'
+export * from './postLabelsWithFormData201'
+export * from './postLabelsWithFormDataBodyThree'
+export * from './postLabelsWithJson201'
+export * from './postLabelsWithJsonBodyOne'
+export * from './postLabelsWithUrlEncoded201'
+export * from './postLabelsWithUrlEncodedBodyTwo'
 export * from './postProjectsWithFormData201'
 export * from './postProjectsWithFormDataBodyThree'
 export * from './postProjectsWithJson201'

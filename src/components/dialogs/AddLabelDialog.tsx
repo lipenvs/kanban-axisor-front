@@ -9,6 +9,8 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+import { usePostLabelsWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
+import { useQueryClient } from '@tanstack/react-query'
 
 const CATEGORY_COLORS = [
   '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B',
@@ -18,14 +20,35 @@ const CATEGORY_COLORS = [
 interface AddLabelDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  projectId: string
 }
 
 export function AddLabelDialog({
   open,
   onOpenChange,
+  projectId,
 }: AddLabelDialogProps) {
   const [newLabelName, setNewLabelName] = useState('')
-  const [newLabelColor, setNewLabelColor] = useState('#FF0000')
+  const [newLabelColor, setNewLabelColor] = useState(CATEGORY_COLORS[0])
+  const queryClient = useQueryClient()
+
+  const { mutate: createLabel, isPending } = usePostLabelsWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: getGetLabelsByProjectIdQueryKey(projectId),
+        })
+        setNewLabelName('')
+        setNewLabelColor(CATEGORY_COLORS[0])
+        onOpenChange(false)
+      },
+    },
+  })
+
+  function handleSubmit() {
+    if (!newLabelName.trim()) return
+    createLabel({ data: { name: newLabelName.trim(), color: newLabelColor, projectId } })
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,7 +89,9 @@ export function AddLabelDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button>Adicionar</Button>
+          <Button onClick={handleSubmit} disabled={isPending || !newLabelName.trim()}>
+            {isPending ? 'Adicionando...' : 'Adicionar'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

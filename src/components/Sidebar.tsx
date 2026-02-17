@@ -14,6 +14,7 @@ import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
+import { useGetLabelsByProjectId } from '@/lib/api/label'
 import { AddLabelDialog } from './dialogs/AddLabelDialog'
 
 export default function Sidebar() {
@@ -24,6 +25,13 @@ export default function Sidebar() {
 
   const { data: projectsResponse } = useGetProjects()
   const projects = projectsResponse?.data?.projects ?? []
+
+  const { data: labelsResponse } = useGetLabelsByProjectId(
+    selectedProjectId ?? '',
+    undefined,
+    { query: { enabled: !!selectedProjectId } },
+  )
+  const labels = labelsResponse?.data?.labels ?? []
 
   return (
     <aside
@@ -94,11 +102,7 @@ export default function Sidebar() {
         </div>
         <ScrollArea className="flex-1">
           <div className="space-y-1">
-            {[
-              { id: '1', name: 'Categoria 1', color: '#FF0000' },
-              { id: '2', name: 'Categoria 2', color: '#00FF00' },
-              { id: '3', name: 'Categoria 3', color: '#0000FF' },
-            ].map((cat) => (
+            {labels.map((cat) => (
               <div
                 key={cat.id}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent transition-colors cursor-pointer group"
@@ -116,10 +120,13 @@ export default function Sidebar() {
         </ScrollArea>
       </div>
 
-      <AddLabelDialog
-        open={showAddLabel}
-        onOpenChange={setShowAddLabel}
-      />
+      {selectedProjectId && (
+        <AddLabelDialog
+          open={showAddLabel}
+          onOpenChange={setShowAddLabel}
+          projectId={selectedProjectId}
+        />
+      )}
     </aside>
   )
 }
