@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { DeleteProjectDialog } from '@/components/dialogs/DeleteProjectDialog'
-import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { ConfirmDeleteDialog } from '@/components/dialogs/ConfirmDeleteDialog'
+import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson } from '@/lib/api/project'
+import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson, useDeleteProjectsById } from '@/lib/api/project'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
   component: TasksPage,
@@ -14,6 +14,7 @@ export const Route = createFileRoute('/_auth/tasks/$projectId')({
 function TasksPage() {
   const { projectId } = Route.useParams()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const { data: projectsResponse, isFetching } = useGetProjects()
   const projects = projectsResponse?.data.projects
   const project = projects?.find((p) => p.id === projectId)
@@ -27,6 +28,16 @@ function TasksPage() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
         setEditingName(false)
+      },
+    },
+  })
+
+  const { mutate: deleteProject, isPending: isDeleting } = useDeleteProjectsById({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
+        setShowDeleteDialog(false)
+        navigate({ to: '/tasks' })
       },
     },
   })
@@ -108,11 +119,13 @@ function TasksPage() {
         </Button>
       </div>
 
-      <DeleteProjectDialog
-        projectId={projectId}
+      <ConfirmDeleteDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        projectName={projectName}
+        title="Excluir projeto"
+        description={<p>Tem certeza que deseja excluir o projeto <span className="font-bold">{projectName}</span>? Essa ação não pode ser desfeita e todas as tarefas serão removidas.</p>}
+        onConfirm={() => deleteProject({ id: projectId })}
+        isPending={isDeleting}
       />
     </div>
   )

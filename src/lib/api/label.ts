@@ -31,6 +31,9 @@ import type {
   PostLabelsWithJsonBodyOne,
   PostLabelsWithUrlEncoded201,
   PostLabelsWithUrlEncodedBodyTwo,
+  PutLabelsByIdWithFormDataBodyThree,
+  PutLabelsByIdWithJsonBodyOne,
+  PutLabelsByIdWithUrlEncodedBodyTwo,
 } from './model'
 
 /**
@@ -593,4 +596,456 @@ export function useGetLabelsByProjectId<
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 
   return { ...query, queryKey: queryOptions.queryKey }
+}
+
+/**
+ * Delete label
+ */
+export type deleteLabelsByIdResponse200 = {
+  data: void
+  status: 200
+}
+
+export type deleteLabelsByIdResponseSuccess = deleteLabelsByIdResponse200 & {
+  headers: Headers
+}
+
+export type deleteLabelsByIdResponse = deleteLabelsByIdResponseSuccess
+
+export const getDeleteLabelsByIdUrl = (id: string) => {
+  return `http://localhost:3333/labels/${id}`
+}
+
+export const deleteLabelsById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteLabelsByIdResponse> => {
+  const res = await fetch(getDeleteLabelsByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'DELETE',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: deleteLabelsByIdResponse['data'] = body ? JSON.parse(body) : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteLabelsByIdResponse
+}
+
+export const getDeleteLabelsByIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLabelsById>>,
+    TError,
+    { id: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteLabelsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteLabelsById']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteLabelsById>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {}
+
+    return deleteLabelsById(id, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteLabelsByIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteLabelsById>>
+>
+
+export type DeleteLabelsByIdMutationError = unknown
+
+export const useDeleteLabelsById = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteLabelsById>>,
+      TError,
+      { id: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteLabelsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteLabelsByIdMutationOptions(options), queryClient)
+}
+/**
+ * Update a label
+ */
+export type putLabelsByIdWithJsonResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putLabelsByIdWithJsonResponseSuccess =
+  putLabelsByIdWithJsonResponse200 & {
+    headers: Headers
+  }
+
+export type putLabelsByIdWithJsonResponse = putLabelsByIdWithJsonResponseSuccess
+
+export const getPutLabelsByIdWithJsonUrl = (id: string) => {
+  return `http://localhost:3333/labels/${id}`
+}
+
+export const putLabelsByIdWithJson = async (
+  id: string,
+  putLabelsByIdWithJsonBodyOne: PutLabelsByIdWithJsonBodyOne,
+  options?: RequestInit,
+): Promise<putLabelsByIdWithJsonResponse> => {
+  const res = await fetch(getPutLabelsByIdWithJsonUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(putLabelsByIdWithJsonBodyOne),
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putLabelsByIdWithJsonResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putLabelsByIdWithJsonResponse
+}
+
+export const getPutLabelsByIdWithJsonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putLabelsByIdWithJson>>,
+    TError,
+    { id: string; data: PutLabelsByIdWithJsonBodyOne },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putLabelsByIdWithJson>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithJsonBodyOne },
+  TContext
+> => {
+  const mutationKey = ['putLabelsByIdWithJson']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putLabelsByIdWithJson>>,
+    { id: string; data: PutLabelsByIdWithJsonBodyOne }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putLabelsByIdWithJson(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutLabelsByIdWithJsonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putLabelsByIdWithJson>>
+>
+export type PutLabelsByIdWithJsonMutationBody = PutLabelsByIdWithJsonBodyOne
+export type PutLabelsByIdWithJsonMutationError = unknown
+
+export const usePutLabelsByIdWithJson = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putLabelsByIdWithJson>>,
+      TError,
+      { id: string; data: PutLabelsByIdWithJsonBodyOne },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putLabelsByIdWithJson>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithJsonBodyOne },
+  TContext
+> => {
+  return useMutation(
+    getPutLabelsByIdWithJsonMutationOptions(options),
+    queryClient,
+  )
+}
+/**
+ * Update a label
+ */
+export type putLabelsByIdWithUrlEncodedResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putLabelsByIdWithUrlEncodedResponseSuccess =
+  putLabelsByIdWithUrlEncodedResponse200 & {
+    headers: Headers
+  }
+
+export type putLabelsByIdWithUrlEncodedResponse =
+  putLabelsByIdWithUrlEncodedResponseSuccess
+
+export const getPutLabelsByIdWithUrlEncodedUrl = (id: string) => {
+  return `http://localhost:3333/labels/${id}`
+}
+
+export const putLabelsByIdWithUrlEncoded = async (
+  id: string,
+  putLabelsByIdWithUrlEncodedBodyTwo: PutLabelsByIdWithUrlEncodedBodyTwo,
+  options?: RequestInit,
+): Promise<putLabelsByIdWithUrlEncodedResponse> => {
+  const formUrlEncoded = new URLSearchParams()
+  formUrlEncoded.append(`name`, putLabelsByIdWithUrlEncodedBodyTwo.name)
+  formUrlEncoded.append(`color`, putLabelsByIdWithUrlEncodedBodyTwo.color)
+
+  const res = await fetch(getPutLabelsByIdWithUrlEncodedUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...options?.headers,
+    },
+    body: formUrlEncoded,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putLabelsByIdWithUrlEncodedResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putLabelsByIdWithUrlEncodedResponse
+}
+
+export const getPutLabelsByIdWithUrlEncodedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>,
+    TError,
+    { id: string; data: PutLabelsByIdWithUrlEncodedBodyTwo },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  const mutationKey = ['putLabelsByIdWithUrlEncoded']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>,
+    { id: string; data: PutLabelsByIdWithUrlEncodedBodyTwo }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putLabelsByIdWithUrlEncoded(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutLabelsByIdWithUrlEncodedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>
+>
+export type PutLabelsByIdWithUrlEncodedMutationBody =
+  PutLabelsByIdWithUrlEncodedBodyTwo
+export type PutLabelsByIdWithUrlEncodedMutationError = unknown
+
+export const usePutLabelsByIdWithUrlEncoded = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>,
+      TError,
+      { id: string; data: PutLabelsByIdWithUrlEncodedBodyTwo },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putLabelsByIdWithUrlEncoded>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  return useMutation(
+    getPutLabelsByIdWithUrlEncodedMutationOptions(options),
+    queryClient,
+  )
+}
+/**
+ * Update a label
+ */
+export type putLabelsByIdWithFormDataResponse200 = {
+  data: void
+  status: 200
+}
+
+export type putLabelsByIdWithFormDataResponseSuccess =
+  putLabelsByIdWithFormDataResponse200 & {
+    headers: Headers
+  }
+
+export type putLabelsByIdWithFormDataResponse =
+  putLabelsByIdWithFormDataResponseSuccess
+
+export const getPutLabelsByIdWithFormDataUrl = (id: string) => {
+  return `http://localhost:3333/labels/${id}`
+}
+
+export const putLabelsByIdWithFormData = async (
+  id: string,
+  putLabelsByIdWithFormDataBodyThree: PutLabelsByIdWithFormDataBodyThree,
+  options?: RequestInit,
+): Promise<putLabelsByIdWithFormDataResponse> => {
+  const formData = new FormData()
+  formData.append(`name`, putLabelsByIdWithFormDataBodyThree.name)
+  formData.append(`color`, putLabelsByIdWithFormDataBodyThree.color)
+
+  const res = await fetch(getPutLabelsByIdWithFormDataUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'PUT',
+    body: formData,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: putLabelsByIdWithFormDataResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putLabelsByIdWithFormDataResponse
+}
+
+export const getPutLabelsByIdWithFormDataMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putLabelsByIdWithFormData>>,
+    TError,
+    { id: string; data: PutLabelsByIdWithFormDataBodyThree },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putLabelsByIdWithFormData>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithFormDataBodyThree },
+  TContext
+> => {
+  const mutationKey = ['putLabelsByIdWithFormData']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putLabelsByIdWithFormData>>,
+    { id: string; data: PutLabelsByIdWithFormDataBodyThree }
+  > = (props) => {
+    const { id, data } = props ?? {}
+
+    return putLabelsByIdWithFormData(id, data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PutLabelsByIdWithFormDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putLabelsByIdWithFormData>>
+>
+export type PutLabelsByIdWithFormDataMutationBody =
+  PutLabelsByIdWithFormDataBodyThree
+export type PutLabelsByIdWithFormDataMutationError = unknown
+
+export const usePutLabelsByIdWithFormData = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putLabelsByIdWithFormData>>,
+      TError,
+      { id: string; data: PutLabelsByIdWithFormDataBodyThree },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putLabelsByIdWithFormData>>,
+  TError,
+  { id: string; data: PutLabelsByIdWithFormDataBodyThree },
+  TContext
+> => {
+  return useMutation(
+    getPutLabelsByIdWithFormDataMutationOptions(options),
+    queryClient,
+  )
 }
