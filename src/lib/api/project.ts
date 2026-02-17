@@ -23,7 +23,8 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import type {
-  GetProjects200Item,
+  GetProjects200,
+  GetProjectsParams,
   PostProjectsWithFormData201,
   PostProjectsWithFormDataBodyThree,
   PostProjectsWithJson201,
@@ -384,7 +385,7 @@ export const usePostProjectsWithFormData = <
  * Get all projects
  */
 export type getProjectsResponse200 = {
-  data: GetProjects200Item[]
+  data: GetProjects200
   status: 200
 }
 
@@ -394,14 +395,27 @@ export type getProjectsResponseSuccess = getProjectsResponse200 & {
 
 export type getProjectsResponse = getProjectsResponseSuccess
 
-export const getGetProjectsUrl = () => {
-  return `http://localhost:3333/projects`
+export const getGetProjectsUrl = (params?: GetProjectsParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `http://localhost:3333/projects?${stringifiedParams}`
+    : `http://localhost:3333/projects`
 }
 
 export const getProjects = async (
+  params?: GetProjectsParams,
   options?: RequestInit,
 ): Promise<getProjectsResponse> => {
-  const res = await fetch(getGetProjectsUrl(), {
+  const res = await fetch(getGetProjectsUrl(params), {
     credentials: 'include',
     ...options,
     method: 'GET',
@@ -417,26 +431,32 @@ export const getProjects = async (
   } as getProjectsResponse
 }
 
-export const getGetProjectsQueryKey = () => {
-  return [`http://localhost:3333/projects`] as const
+export const getGetProjectsQueryKey = (params?: GetProjectsParams) => {
+  return [
+    `http://localhost:3333/projects`,
+    ...(params ? [params] : []),
+  ] as const
 }
 
 export const getGetProjectsQueryOptions = <
   TData = Awaited<ReturnType<typeof getProjects>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
-  >
-  fetch?: RequestInit
-}) => {
+>(
+  params?: GetProjectsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
+    >
+    fetch?: RequestInit
+  },
+) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetProjectsQueryKey()
+  const queryKey = queryOptions?.queryKey ?? getGetProjectsQueryKey(params)
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getProjects>>> = ({
     signal,
-  }) => getProjects({ signal, ...fetchOptions })
+  }) => getProjects(params, { signal, ...fetchOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getProjects>>,
@@ -454,6 +474,7 @@ export function useGetProjects<
   TData = Awaited<ReturnType<typeof getProjects>>,
   TError = unknown,
 >(
+  params: undefined | GetProjectsParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
@@ -476,6 +497,7 @@ export function useGetProjects<
   TData = Awaited<ReturnType<typeof getProjects>>,
   TError = unknown,
 >(
+  params?: GetProjectsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
@@ -498,6 +520,7 @@ export function useGetProjects<
   TData = Awaited<ReturnType<typeof getProjects>>,
   TError = unknown,
 >(
+  params?: GetProjectsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
@@ -513,6 +536,7 @@ export function useGetProjects<
   TData = Awaited<ReturnType<typeof getProjects>>,
   TError = unknown,
 >(
+  params?: GetProjectsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getProjects>>, TError, TData>
@@ -523,7 +547,7 @@ export function useGetProjects<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 } {
-  const queryOptions = getGetProjectsQueryOptions(options)
+  const queryOptions = getGetProjectsQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

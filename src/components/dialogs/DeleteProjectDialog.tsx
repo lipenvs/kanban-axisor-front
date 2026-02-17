@@ -7,10 +7,10 @@ import {
   DialogTitle,
 } from '../ui/dialog'
 import { Button } from '../ui/button'
-import { useDeleteProjectsById, getGetProjectsQueryKey } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
+import { useDeleteProjectsById, getGetProjectsQueryKey } from '@/lib/api/project'
 
 interface DeleteProjectDialogProps {
   open: boolean

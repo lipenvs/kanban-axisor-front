@@ -7,7 +7,9 @@
  */
 
 export * from './account'
-export * from './getProjects200Item'
+export * from './getProjects200'
+export * from './getProjects200ProjectsItem'
+export * from './getProjectsParams'
 export * from './postProjectsWithFormData201'
 export * from './postProjectsWithFormDataBodyThree'
 export * from './postProjectsWithJson201'

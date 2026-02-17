@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.0.0
  */
 
-export type GetProjects200Item = {
-  id: string
-  name: string
+export type GetProjectsParams = {
+  search?: string
 }
