@@ -7,6 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getFieldErrors(errors: unknown[]): string[] {
   return errors
-    .map((e) => (typeof e === 'string' ? e : (e as { message?: string })?.message ?? ''))
+    .map((e) =>
+      typeof e === 'string' ? e : ((e as { message?: string })?.message ?? ''),
+    )
     .filter(Boolean)
 }

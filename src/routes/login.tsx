@@ -5,7 +5,12 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon } from '@/components/icons/google'
 import { LinkedInIcon } from '@/components/icons/linkedin'
@@ -30,17 +35,20 @@ function LoginPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      await auth.signIn.email({
-        email: value.email,
-        password: value.password,
-      }, {
-        onSuccess: () => {
-          navigate({ to: '/tasks' })
+      await auth.signIn.email(
+        {
+          email: value.email,
+          password: value.password,
         },
-        onError: (ctx) => {
-          alert(ctx.error.message || 'Erro ao fazer login')
+        {
+          onSuccess: () => {
+            navigate({ to: '/tasks' })
+          },
+          onError: (ctx) => {
+            alert(ctx.error.message || 'Erro ao fazer login')
+          },
         },
-      })
+      )
     },
     validators: {
       onSubmit: loginSchema,

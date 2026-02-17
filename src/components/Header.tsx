@@ -4,7 +4,13 @@ import { auth } from '../lib/auth'
 import { Bell, Search, LogOut, Settings, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Input } from './ui/input'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import { AddProjectDialog } from './dialogs/AddProjectDialog'
@@ -71,8 +77,12 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <div className="px-3 py-2">
-                <p className="text-sm font-medium">{data?.user?.name ?? 'Usuário'}</p>
-                <p className="text-xs text-muted-foreground">{data?.user?.email ?? 'Email'}</p>
+                <p className="text-sm font-medium">
+                  {data?.user?.name ?? 'Usuário'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {data?.user?.email ?? 'Email'}
+                </p>
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem>

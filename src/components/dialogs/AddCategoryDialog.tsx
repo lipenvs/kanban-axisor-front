@@ -1,15 +1,24 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog'
+import { Label } from '../ui/label'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
 
 interface AddCategoryDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function AddCategoryDialog({ open, onOpenChange }: AddCategoryDialogProps) {
+export function AddCategoryDialog({
+  open,
+  onOpenChange,
+}: AddCategoryDialogProps) {
   const [newCatName, setNewCatName] = useState('')
   const [newCatColor, setNewCatColor] = useState('#FF0000')
 
@@ -39,7 +48,8 @@ export function AddCategoryDialog({ open, onOpenChange }: AddCategoryDialogProps
                   className="w-7 h-7 rounded-full transition-all"
                   style={{
                     backgroundColor: color,
-                    outline: newCatColor === color ? `2px solid ${color}` : 'none',
+                    outline:
+                      newCatColor === color ? `2px solid ${color}` : 'none',
                     outlineOffset: '2px',
                   }}
                 />

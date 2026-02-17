@@ -3,7 +3,12 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field'
 import { ArrowLeft } from 'lucide-react'
 
 const registerSchema = z.object({
@@ -20,7 +25,7 @@ function ForgotPasswordPage() {
       email: '',
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      console.log(value)
     },
     validators: {
       onSubmit: registerSchema,

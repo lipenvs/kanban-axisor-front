@@ -1,13 +1,21 @@
-import { LayoutDashboard, Plus, Users } from "lucide-react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
-import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
-import { useState } from "react";
-import { AddCategoryDialog } from "./dialogs/AddCategoryDialog";
+import { LayoutDashboard, Plus, Users } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+import { Separator } from './ui/separator'
+import { Button } from './ui/button'
+import { ScrollArea } from './ui/scroll-area'
+import { useState } from 'react'
+import { AddCategoryDialog } from './dialogs/AddCategoryDialog'
 
 export default function Sidebar() {
-  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(false)
 
   return (
     <aside
@@ -25,14 +33,17 @@ export default function Sidebar() {
       </div>
 
       <div className="px-4 pb-6">
-        <Select value="1" onValueChange={() => { }}>
+        <Select value="1" onValueChange={() => {}}>
           <SelectTrigger className="w-full bg-muted/50 border-border/50 h-10">
             <SelectValue placeholder="Selecionar projeto" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Projetos</SelectLabel>
-              {[{ id: "1", name: "Projeto 1" }, { id: "2", name: "Projeto 2" }].map((p) => (
+              {[
+                { id: '1', name: 'Projeto 1' },
+                { id: '2', name: 'Projeto 2' },
+              ].map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
                 </SelectItem>
@@ -73,7 +84,11 @@ export default function Sidebar() {
         </div>
         <ScrollArea className="flex-1">
           <div className="space-y-1">
-            {[{ id: "1", name: "Categoria 1", color: "#FF0000" }, { id: "2", name: "Categoria 2", color: "#00FF00" }, { id: "3", name: "Categoria 3", color: "#0000FF" }].map((cat) => (
+            {[
+              { id: '1', name: 'Categoria 1', color: '#FF0000' },
+              { id: '2', name: 'Categoria 2', color: '#00FF00' },
+              { id: '3', name: 'Categoria 3', color: '#0000FF' },
+            ].map((cat) => (
               <div
                 key={cat.id}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent transition-colors cursor-pointer group"
@@ -91,7 +106,10 @@ export default function Sidebar() {
         </ScrollArea>
       </div>
 
-      <AddCategoryDialog open={showAddCategory} onOpenChange={setShowAddCategory} />
+      <AddCategoryDialog
+        open={showAddCategory}
+        onOpenChange={setShowAddCategory}
+      />
     </aside>
   )
 }
