@@ -15,31 +15,31 @@ const CATEGORY_COLORS = [
   '#EC4899', '#06B6D4', '#84CC16',
 ]
 
-interface AddCategoryDialogProps {
+interface AddLabelDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function AddCategoryDialog({
+export function AddLabelDialog({
   open,
   onOpenChange,
-}: AddCategoryDialogProps) {
-  const [newCatName, setNewCatName] = useState('')
-  const [newCatColor, setNewCatColor] = useState('#FF0000')
+}: AddLabelDialogProps) {
+  const [newLabelName, setNewLabelName] = useState('')
+  const [newLabelColor, setNewLabelColor] = useState('#FF0000')
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[360px]">
         <DialogHeader>
-          <DialogTitle>Nova categoria</DialogTitle>
+          <DialogTitle>Nova etiqueta</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="cat-name">Nome</Label>
+            <Label htmlFor="label-name">Nome</Label>
             <Input
-              id="cat-name"
-              value={newCatName}
-              onChange={(e) => setNewCatName(e.target.value)}
+              id="label-name"
+              value={newLabelName}
+              onChange={(e) => setNewLabelName(e.target.value)}
               placeholder="Ex: Marketing"
             />
           </div>
@@ -49,12 +49,12 @@ export function AddCategoryDialog({
               {CATEGORY_COLORS.map((color) => (
                 <button
                   key={color}
-                  onClick={() => setNewCatColor(color)}
+                  onClick={() => setNewLabelColor(color)}
                   className="w-7 h-7 rounded-full transition-all"
                   style={{
                     backgroundColor: color,
                     outline:
-                      newCatColor === color ? `2px solid ${color}` : 'none',
+                      newLabelColor === color ? `2px solid ${color}` : 'none',
                     outlineOffset: '2px',
                   }}
                 />

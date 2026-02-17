@@ -12,12 +12,12 @@ import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
-import { AddCategoryDialog } from './dialogs/AddCategoryDialog'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
+import { AddLabelDialog } from './dialogs/AddLabelDialog'
 
 export default function Sidebar() {
-  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showAddLabel, setShowAddLabel] = useState(false)
   const navigate = useNavigate()
   const params = useParams({ strict: false }) as { projectId?: string }
   const selectedProjectId = params.projectId
@@ -80,14 +80,14 @@ export default function Sidebar() {
 
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Categorias
-          </span>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Etiquetas
+          </h3>
           <Button
             variant="ghost"
             size="icon"
             className="h-6 w-6 text-muted-foreground hover:text-foreground"
-            onClick={() => setShowAddCategory(true)}
+            onClick={() => setShowAddLabel(true)}
           >
             <Plus className="w-3.5 h-3.5" />
           </Button>
@@ -116,9 +116,9 @@ export default function Sidebar() {
         </ScrollArea>
       </div>
 
-      <AddCategoryDialog
-        open={showAddCategory}
-        onOpenChange={setShowAddCategory}
+      <AddLabelDialog
+        open={showAddLabel}
+        onOpenChange={setShowAddLabel}
       />
     </aside>
   )
