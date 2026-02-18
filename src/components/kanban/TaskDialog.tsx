@@ -48,6 +48,7 @@ interface TaskDialogProps {
     description?: string
     dueDate?: string | null
     labelId?: string | null
+    assigneeId?: string | null
   }) => void
   isPending?: boolean
 }
@@ -100,23 +101,26 @@ export default function TaskDialog({
         setDescription(task.description ?? '')
         setDueDate(formatDateForInput(task.dueDate))
         setLabelId(task.labelId ?? '')
+        setAssignee(task.assigneeId ?? '')
       } else {
         setTitle('')
         setDescription('')
         setDueDate('')
         setLabelId('')
+        setAssignee(session?.user?.id ?? '')
       }
       setAttachments([])
     }
-  }, [open, task, labels])
+  }, [open, task, labels, session])
 
   function handleSubmit() {
-    if (!title.trim()) return
+    if (!title.trim() || !assignee) return
     onSubmit({
       title: title.trim(),
       description: description.trim() || undefined,
       dueDate: dueDate || null,
       labelId: labelId || null,
+      assigneeId: assignee,
     })
   }
 
@@ -359,7 +363,7 @@ export default function TaskDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={isPending || !title.trim()}>
+          <Button onClick={handleSubmit} disabled={isPending || !title.trim() || !assignee}>
             {isEditing ? 'Salvar' : 'Criar'}
           </Button>
         </DialogFooter>

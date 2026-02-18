@@ -1,13 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Calendar, Trash2 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from '@/lib/auth'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
+import { Progress } from '../ui/progress'
 
 interface TaskCardProps {
   task: GetTasks200TasksItem
@@ -64,6 +64,7 @@ export default function TaskCard({ task, label, onClick, onDelete }: TaskCardPro
         ${isDragging ? 'opacity-50 shadow-xl shadow-black/10 scale-[1.02] z-50' : ''}
       `}
     >
+
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-sm font-medium text-foreground leading-snug line-clamp-2">
           {task.title}
@@ -84,32 +85,25 @@ export default function TaskCard({ task, label, onClick, onDelete }: TaskCardPro
         )}
       </div>
 
-      {task.description && (
-        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
-          {task.description}
-        </p>
-      )}
+      <Progress className="mt-4" value={66} />
 
       {(label || !!task.dueDate || session?.user) && (
-        <div className="flex items-center justify-between mt-2.5">
+        <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2">
+            {label && (
+              <div
+                className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border"
+                style={{ borderColor: label.color, color: label.color }}
+              >
+                {label.name}
+              </div>
+            )}
+
             {!!task.dueDate && (
-              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
                 <Calendar className="w-3 h-3" />
                 {formatDate(task.dueDate)}
               </span>
-            )}
-            {label && (
-              <Badge
-                variant="outline"
-                className="text-[10px] h-5 px-1.5 border-none font-medium"
-                style={{
-                  backgroundColor: `${label.color}20`,
-                  color: label.color,
-                }}
-              >
-                {label.name}
-              </Badge>
             )}
           </div>
 

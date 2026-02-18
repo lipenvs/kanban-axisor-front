@@ -39,6 +39,15 @@ import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+  const [activeColumn, setActiveColumn] = useState<Column | null>(null)
+  const [columnDialogOpen, setColumnDialogOpen] = useState(false)
+  const [editingColumn, setEditingColumn] = useState<Column | null>(null)
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<GetTasks200TasksItem | null>(null)
+  const [defaultColumnId, setDefaultColumnId] = useState<string | null>(null)
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
+
   const queryClient = useQueryClient()
 
   const { data: columnsResponse } = useGetColumns({ projectId })
@@ -114,15 +123,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
   const { mutateAsync: reorderTasks } = usePostTasksReorderWithJson()
 
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
-  const [activeColumn, setActiveColumn] = useState<Column | null>(null)
-  const [columnDialogOpen, setColumnDialogOpen] = useState(false)
-  const [editingColumn, setEditingColumn] = useState<Column | null>(null)
-  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
-  const [editingTask, setEditingTask] = useState<GetTasks200TasksItem | null>(null)
-  const [defaultColumnId, setDefaultColumnId] = useState<string | null>(null)
-  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   )
@@ -152,8 +152,10 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     description?: string
     dueDate?: string | null
     labelId?: string | null
+    assigneeId?: string | null
   }) {
     const labelId = data.labelId ?? undefined
+    const assigneeId = data.assigneeId ?? undefined
 
     if (editingTask) {
       updateTask({
@@ -163,6 +165,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           description: data.description,
           dueDate: data.dueDate,
           labelId,
+          assigneeId,
         },
       })
     } else if (defaultColumnId) {
@@ -173,6 +176,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           dueDate: data.dueDate,
           labelId: labelId!,
           columnId: defaultColumnId,
+          assigneeId,
         },
       })
     }
