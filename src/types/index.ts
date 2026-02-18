@@ -1,20 +1,5 @@
-export type Task = {
-  id: string
-  title: string
-  columnId: string
-  order: number
-  categoryId?: string
-  assigneeId?: string
-}
-
-export type Category = {
+export type Attachment = {
   id: string
   name: string
-  color: string
-}
-
-export type User = {
-  id: string
-  name: string
-  avatarUrl?: string
+  size: number
 }

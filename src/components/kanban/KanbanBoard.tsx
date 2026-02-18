@@ -13,6 +13,8 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import KanbanColumn from '@/components/kanban/KanbanColumn'
 import { Plus } from 'lucide-react'
 import ColumnDialog from './ColumnDialog'
+import TaskDialog from './TaskDialog'
+import { ConfirmDeleteDialog } from '../dialogs/ConfirmDeleteDialog'
 import {
   useGetColumns,
   getGetColumnsQueryKey,
@@ -21,17 +23,33 @@ import {
   usePutColumnsByIdWithJson,
   useDeleteColumnsById,
 } from '@/lib/api/column'
+import {
+  useGetTasks,
+  getGetTasksQueryKey,
+  usePostTasksWithJson,
+  usePutTasksByIdWithJson,
+  useDeleteTasksById,
+  usePostTasksReorderWithJson,
+} from '@/lib/api/task'
+import {
+  useGetLabelsByProjectId,
+} from '@/lib/api/label'
 import { useQueryClient } from '@tanstack/react-query'
-import type { Task, Category, User } from '@/types'
 import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
+import type { GetTasks200TasksItem } from '@/lib/api/model'
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient()
-  const { data: columnsResponse } = useGetColumns({ projectId })
 
-  const columns = useMemo(() => {
-    return columnsResponse?.data.columns ?? []
-  }, [columnsResponse])
+  const { data: columnsResponse } = useGetColumns({ projectId })
+  const { data: tasksResponse } = useGetTasks({ projectId })
+  const { data: labelsResponse } = useGetLabelsByProjectId(projectId)
+
+  const columns = useMemo(() => columnsResponse?.data.columns ?? [], [columnsResponse])
+  const tasks = useMemo(() => tasksResponse?.data.tasks ?? [], [tasksResponse])
+  const labels = useMemo(() => labelsResponse?.data.labels ?? [], [labelsResponse])
+
+  const tasksQueryKey = getGetTasksQueryKey({ projectId })
 
   const { mutate: createColumn } = usePostColumnsWithJson({
     mutation: {
@@ -39,8 +57,8 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
         setColumnDialogOpen(false)
         setEditingColumn(null)
-      }
-    }
+      },
+    },
   })
 
   const { mutate: updateColumn } = usePutColumnsByIdWithJson({
@@ -49,33 +67,64 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
         setColumnDialogOpen(false)
         setEditingColumn(null)
-      }
-    }
+      },
+    },
   })
 
   const { mutate: deleteColumn } = useDeleteColumnsById({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
-      }
-    }
+        queryClient.invalidateQueries({ queryKey: tasksQueryKey })
+      },
+    },
   })
 
   const { mutateAsync: reorderColumns } = usePostColumnsReorderWithJson()
 
-  // UI State
+  const { mutate: createTask, isPending: isCreatingTask } = usePostTasksWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: tasksQueryKey })
+        setTaskDialogOpen(false)
+        setEditingTask(null)
+        setDefaultColumnId(null)
+      },
+    },
+  })
+
+  const { mutate: updateTask, isPending: isUpdatingTask } = usePutTasksByIdWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: tasksQueryKey })
+        setTaskDialogOpen(false)
+        setEditingTask(null)
+      },
+    },
+  })
+
+  const { mutate: deleteTask, isPending: isDeletingTask } = useDeleteTasksById({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: tasksQueryKey })
+        setDeleteTaskId(null)
+      },
+    },
+  })
+
+  const { mutateAsync: reorderTasks } = usePostTasksReorderWithJson()
+
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
   const [activeColumn, setActiveColumn] = useState<Column | null>(null)
   const [columnDialogOpen, setColumnDialogOpen] = useState(false)
   const [editingColumn, setEditingColumn] = useState<Column | null>(null)
-
-  // TODO: Integrate Task/Category/User API
-  const tasks: Task[] = []
-  const categories: Category[] = []
-  const users: User[] = []
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<GetTasks200TasksItem | null>(null)
+  const [defaultColumnId, setDefaultColumnId] = useState<string | null>(null)
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   )
 
   function handleColumnSubmit(title: string) {
@@ -87,18 +136,46 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
   }
 
   function handleCreateTask(columnId: string) {
-    // TODO: Create task API
-    console.log('Create task', columnId)
+    setEditingTask(null)
+    setDefaultColumnId(columnId)
+    setTaskDialogOpen(true)
   }
 
-  function handleEditTask(task: Task) {
-    // TODO: abrir modal de edição
-    console.log('Edit task', task)
+  function handleEditTask(task: GetTasks200TasksItem) {
+    setEditingTask(task)
+    setDefaultColumnId(null)
+    setTaskDialogOpen(true)
   }
 
-  function handleDeleteTask(id: string) {
-    // TODO: Delete task API
-    console.log('Delete task', id)
+  function handleTaskSubmit(data: {
+    title: string
+    description?: string
+    dueDate?: string | null
+    labelId?: string | null
+  }) {
+    const labelId = data.labelId ?? undefined
+
+    if (editingTask) {
+      updateTask({
+        id: editingTask.id,
+        data: {
+          title: data.title,
+          description: data.description,
+          dueDate: data.dueDate,
+          labelId,
+        },
+      })
+    } else if (defaultColumnId) {
+      createTask({
+        data: {
+          title: data.title,
+          description: data.description,
+          dueDate: data.dueDate,
+          labelId: labelId!,
+          columnId: defaultColumnId,
+        },
+      })
+    }
   }
 
   function handleEditColumn(column: Column) {
@@ -113,7 +190,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
   function handleDeleteColumn(id: string) {
     deleteColumn({ id })
-    // setTasks((prev) => prev.filter((t) => t.columnId !== id)) // Logic for tasks needs to be handled by backend cascade delete or frontend optimistic update, leaving for now as backend handles cascade delete for columns? Schema says cascade delete on project, but maybe not on tasks? Assuming tasks are deleted by backend.
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -134,16 +210,12 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     const isActiveColumn = active.data.current?.type === 'Column'
     if (isActiveColumn) {
       const activeColumnData = active.data.current?.column as Column
-      // over pode ser um droppable de coluna (id = column.id)
       const overColumnId = over.id as string
       if (activeColumnData.id === overColumnId) return
 
       const queryKey = getGetColumnsQueryKey({ projectId })
-
-      // Snapshot antes do update otimista para reverter em caso de erro
       const snapshot = queryClient.getQueryData(queryKey)
 
-      // Update otimista: move no cache
       queryClient.setQueryData(queryKey, (old: any) => {
         if (!old?.data?.columns) return old
         const newColumns = [...old.data.columns] as Column[]
@@ -157,29 +229,58 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       })
 
       reorderColumns({ data: { activeId: activeColumnData.id, overId: overColumnId } })
-        .then(() => {
-          queryClient.invalidateQueries({ queryKey })
-        })
-        .catch(() => {
-          // Reverte para o estado anterior em caso de erro
-          queryClient.setQueryData(queryKey, snapshot)
-        })
+        .then(() => queryClient.invalidateQueries({ queryKey }))
+        .catch(() => queryClient.setQueryData(queryKey, snapshot))
       return
     }
 
-    const activeId = active.id
-    const overId = over.id
+    const activeId = active.id as string
+    const overId = over.id as string
     if (activeId === overId) return
 
-    const isColumn = columns.some((c) => c.id === overId)
-    if (isColumn) {
-      // TODO: Move task to column API
+    const isOverColumn = columns.some((c) => c.id === overId)
+    const snapshot = queryClient.getQueryData(tasksQueryKey)
+
+    if (isOverColumn) {
+      queryClient.setQueryData(tasksQueryKey, (old: any) => {
+        if (!old?.data?.tasks) return old
+        const newTasks = old.data.tasks.map((t: GetTasks200TasksItem) =>
+          t.id === activeId ? { ...t, columnId: overId } : t,
+        )
+        return { ...old, data: { ...old.data, tasks: newTasks } }
+      })
+
+      reorderTasks({ data: { activeId, columnId: overId } })
+        .then(() => queryClient.invalidateQueries({ queryKey: tasksQueryKey }))
+        .catch(() => queryClient.setQueryData(tasksQueryKey, snapshot))
       return
     }
 
     const overTask = tasks.find((t) => t.id === overId)
     if (overTask) {
-      // TODO: Reorder task API
+      const activeTask = tasks.find((t) => t.id === activeId)
+      if (!activeTask) return
+
+      queryClient.setQueryData(tasksQueryKey, (old: any) => {
+        if (!old?.data?.tasks) return old
+        const newTasks = [...old.data.tasks] as GetTasks200TasksItem[]
+        const activeIdx = newTasks.findIndex((t) => t.id === activeId)
+        const overIdx = newTasks.findIndex((t) => t.id === overId)
+        if (activeIdx === -1 || overIdx === -1) return old
+        const [moved] = newTasks.splice(activeIdx, 1)
+        newTasks.splice(overIdx, 0, { ...moved, columnId: overTask.columnId })
+        return { ...old, data: { ...old.data, tasks: newTasks } }
+      })
+
+      reorderTasks({
+        data: {
+          activeId,
+          overId,
+          columnId: overTask.columnId !== activeTask.columnId ? overTask.columnId : undefined,
+        },
+      })
+        .then(() => queryClient.invalidateQueries({ queryKey: tasksQueryKey }))
+        .catch(() => queryClient.setQueryData(tasksQueryKey, snapshot))
     }
   }
 
@@ -195,27 +296,26 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       >
         <ScrollArea className="flex-1">
           <div className="flex gap-5 pb-4 h-full">
-              {columns.map((column) => (
-                <KanbanColumn
-                  key={column.id}
-                  column={column}
-                  tasks={tasks.filter((t) => t.columnId === column.id)}
-                  categories={categories}
-                  users={users}
-                  onCreateTask={handleCreateTask}
-                  onEditTask={handleEditTask}
-                  onDeleteTask={handleDeleteTask}
-                  onEditColumn={handleEditColumn}
-                  onDeleteColumn={handleDeleteColumn}
-                />
-              ))}
+            {columns.map((column) => (
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                tasks={tasks.filter((t) => t.columnId === column.id)}
+                labels={labels}
+                onCreateTask={handleCreateTask}
+                onEditTask={handleEditTask}
+                onDeleteTask={(id) => setDeleteTaskId(id)}
+                onEditColumn={handleEditColumn}
+                onDeleteColumn={handleDeleteColumn}
+              />
+            ))}
             <button
               onClick={handleAddColumn}
               className="w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10
-              rounded-xl border-2 border-dashed border-border/40 hover:border-border
-              text-muted-foreground hover:text-foreground
-              bg-muted/10 hover:bg-muted/30
-              transition-all duration-200 cursor-pointer"
+                rounded-xl border-2 border-dashed border-border/40 hover:border-border
+                text-muted-foreground hover:text-foreground
+                bg-muted/10 hover:bg-muted/30
+                transition-all duration-200 cursor-pointer"
             >
               <Plus className="w-5 h-5" />
               <span className="text-sm font-medium">Nova coluna</span>
@@ -229,12 +329,11 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
             <KanbanColumn
               column={activeColumn}
               tasks={tasks.filter((t) => t.columnId === activeColumn.id)}
-              categories={categories}
-              users={users}
+              labels={labels}
               onDeleteColumn={handleDeleteColumn}
               onCreateTask={handleCreateTask}
               onEditTask={handleEditTask}
-              onDeleteTask={handleDeleteTask}
+              onDeleteTask={(id) => setDeleteTaskId(id)}
               onEditColumn={handleEditColumn}
             />
           ) : null}
@@ -253,6 +352,30 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         onOpenChange={setColumnDialogOpen}
         column={editingColumn}
         onSubmit={handleColumnSubmit}
+      />
+
+      <TaskDialog
+        open={taskDialogOpen}
+        onOpenChange={(open) => {
+          setTaskDialogOpen(open)
+          if (!open) {
+            setEditingTask(null)
+            setDefaultColumnId(null)
+          }
+        }}
+        task={editingTask}
+        labels={labels}
+        onSubmit={handleTaskSubmit}
+        isPending={isCreatingTask || isUpdatingTask}
+      />
+
+      <ConfirmDeleteDialog
+        open={!!deleteTaskId}
+        onOpenChange={(open) => !open && setDeleteTaskId(null)}
+        title="Excluir tarefa"
+        description="Tem certeza que deseja excluir esta tarefa? Esta acao nao pode ser desfeita."
+        onConfirm={() => deleteTaskId && deleteTask({ id: deleteTaskId })}
+        isPending={isDeletingTask}
       />
     </>
   )

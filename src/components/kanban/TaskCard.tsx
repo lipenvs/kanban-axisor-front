@@ -1,18 +1,25 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Trash2 } from 'lucide-react'
+import { Calendar, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { Task, Category, User } from '@/types'
+import type { GetTasks200TasksItem } from '@/lib/api/model'
+import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 
 interface TaskCardProps {
-  task: Task
-  category?: Category
-  assignee?: User
+  task: GetTasks200TasksItem
+  label?: GetLabelsByProjectId200LabelsItem
   onClick?: () => void
   onDelete?: () => void
 }
 
-export default function TaskCard({ task, category, assignee, onClick, onDelete }: TaskCardProps) {
+function formatDate(dateStr: unknown) {
+  if (!dateStr) return null
+  const d = new Date(dateStr as string)
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+}
+
+export default function TaskCard({ task, label, onClick, onDelete }: TaskCardProps) {
   const {
     setNodeRef,
     attributes,
@@ -33,15 +40,25 @@ export default function TaskCard({ task, category, assignee, onClick, onDelete }
       style={style}
       {...listeners}
       {...attributes}
-      onClick={onClick}
-      className={`bg-white border border-gray-200 rounded-xl p-3.5 cursor-grab active:cursor-grabbing transition-opacity group ${
-        isDragging ? 'opacity-50' : ''
-      }`}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest('[data-delete-btn]')) return
+        onClick?.()
+      }}
+      className={`
+        group relative bg-card border border-border/60 rounded-xl p-3.5
+        cursor-grab active:cursor-grabbing
+        hover:border-border hover:shadow-md hover:shadow-black/5
+        transition-all duration-200
+        ${isDragging ? 'opacity-50 shadow-xl shadow-black/10 scale-[1.02] z-50' : ''}
+      `}
     >
       <div className="flex items-start justify-between gap-2">
-        <h4 className="text-sm font-medium text-foreground">{task.title}</h4>
+        <h4 className="text-sm font-medium text-foreground leading-snug line-clamp-2">
+          {task.title}
+        </h4>
         {onDelete && (
           <Button
+            data-delete-btn
             variant="ghost"
             size="icon"
             className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
@@ -55,20 +72,31 @@ export default function TaskCard({ task, category, assignee, onClick, onDelete }
         )}
       </div>
 
-      {(category || assignee) && (
-        <div className="flex items-center gap-2 mt-2">
-          {category && (
-            <span
-              className="text-[10px] font-medium px-1.5 py-0.5 rounded"
-              style={{ backgroundColor: category.color + '20', color: category.color }}
-            >
-              {category.name}
+      {task.description && (
+        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+          {task.description}
+        </p>
+      )}
+
+      {(label || !!task.dueDate) && (
+        <div className="flex items-center gap-2 mt-2.5">
+          {!!task.dueDate && (
+            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Calendar className="w-3 h-3" />
+              {formatDate(task.dueDate)}
             </span>
           )}
-          {assignee && (
-            <span className="text-[10px] text-muted-foreground ml-auto">
-              {assignee.name}
-            </span>
+          {label && (
+            <Badge
+              variant="outline"
+              className="text-[10px] h-5 px-1.5 border-none font-medium"
+              style={{
+                backgroundColor: `${label.color}20`,
+                color: label.color,
+              }}
+            >
+              {label.name}
+            </Badge>
           )}
         </div>
       )}
