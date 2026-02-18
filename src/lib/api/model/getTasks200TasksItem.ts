@@ -5,6 +5,7 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { GetTasks200TasksItemAssignee } from './getTasks200TasksItemAssignee'
 
 export type GetTasks200TasksItem = {
   id: string
@@ -18,4 +19,8 @@ export type GetTasks200TasksItem = {
   dueDate?: unknown | null
   createdAt?: unknown | null
   updatedAt?: unknown | null
+  /** @nullable */
+  assigneeId?: string | null
+  /** @nullable */
+  assignee?: GetTasks200TasksItemAssignee
 }

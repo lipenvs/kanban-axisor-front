@@ -3,6 +3,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { Calendar, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { useQuery } from '@tanstack/react-query'
+import { auth } from '@/lib/auth'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 
@@ -28,6 +31,15 @@ export default function TaskCard({ task, label, onClick, onDelete }: TaskCardPro
     transition,
     isDragging,
   } = useSortable({ id: task.id })
+
+  const { data: sessionData } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const response = await auth.getSession()
+      return response.data
+    },
+  })
+  const session = sessionData
 
   const style = {
     transition,
@@ -78,25 +90,35 @@ export default function TaskCard({ task, label, onClick, onDelete }: TaskCardPro
         </p>
       )}
 
-      {(label || !!task.dueDate) && (
-        <div className="flex items-center gap-2 mt-2.5">
-          {!!task.dueDate && (
-            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Calendar className="w-3 h-3" />
-              {formatDate(task.dueDate)}
-            </span>
-          )}
-          {label && (
-            <Badge
-              variant="outline"
-              className="text-[10px] h-5 px-1.5 border-none font-medium"
-              style={{
-                backgroundColor: `${label.color}20`,
-                color: label.color,
-              }}
-            >
-              {label.name}
-            </Badge>
+      {(label || !!task.dueDate || session?.user) && (
+        <div className="flex items-center justify-between mt-2.5">
+          <div className="flex items-center gap-2">
+            {!!task.dueDate && (
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Calendar className="w-3 h-3" />
+                {formatDate(task.dueDate)}
+              </span>
+            )}
+            {label && (
+              <Badge
+                variant="outline"
+                className="text-[10px] h-5 px-1.5 border-none font-medium"
+                style={{
+                  backgroundColor: `${label.color}20`,
+                  color: label.color,
+                }}
+              >
+                {label.name}
+              </Badge>
+            )}
+          </div>
+
+          {session?.user && (
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
+                {session.user.name?.charAt(0) ?? 'U'}
+              </AvatarFallback>
+            </Avatar>
           )}
         </div>
       )}

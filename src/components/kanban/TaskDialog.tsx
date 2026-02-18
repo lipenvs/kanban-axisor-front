@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { auth } from '@/lib/auth'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Dialog,
   DialogContent,
@@ -16,7 +19,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Upload, X, FileText, Paperclip } from 'lucide-react'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
+import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown } from 'lucide-react'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 import type { Attachment } from '@/types'
@@ -58,12 +75,23 @@ export default function TaskDialog({
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const { data: sessionData } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const response = await auth.getSession()
+      return response.data
+    },
+  })
+  const session = sessionData
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [labelId, setLabelId] = useState('')
+  const [assignee, setAssignee] = useState('')
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
+  const [openCombobox, setOpenCombobox] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -183,6 +211,69 @@ export default function TaskDialog({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Responsável</Label>
+            <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openCombobox}
+                  className="w-full justify-between font-normal px-3"
+                >
+                  {assignee && session?.user && assignee === session.user.id ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
+                          {session.user.name?.charAt(0) ?? 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{session.user.name}</span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">Selecione um responsável</span>
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Procurar responsável..." />
+                  <CommandList>
+                    <CommandEmpty>Nenhum responsável encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {session?.user && (
+                        <CommandItem
+                          key={session.user.id}
+                          value={session.user.name ?? ''}
+                          onSelect={() => {
+                            setAssignee(session.user.id === assignee ? '' : session.user.id)
+                            setOpenCombobox(false)
+                          }}
+                        >
+                          <div className="flex items-center gap-2 flex-1">
+                            <Avatar className="h-6 w-6">
+                              <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
+                                {session.user.name?.charAt(0) ?? 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{session.user.name}</span>
+                          </div>
+                          <Check
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              assignee === session.user.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      )}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-2">
