@@ -34,7 +34,7 @@ export default function TaskCard({ task, category, assignee, onClick, onDelete }
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`bg-card border border-border rounded-xl p-3.5 cursor-grab active:cursor-grabbing transition-opacity group ${
+      className={`bg-white border border-gray-200 rounded-xl p-3.5 cursor-grab active:cursor-grabbing transition-opacity group ${
         isDragging ? 'opacity-50' : ''
       }`}
     >
