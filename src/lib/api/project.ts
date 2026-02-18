@@ -52,7 +52,7 @@ export type postProjectsWithJsonResponseSuccess =
 export type postProjectsWithJsonResponse = postProjectsWithJsonResponseSuccess
 
 export const getPostProjectsWithJsonUrl = () => {
-  return `http://localhost:3333/projects`
+  return `http://localhost:3333/projects/`
 }
 
 export const postProjectsWithJson = async (
@@ -162,7 +162,7 @@ export type postProjectsWithUrlEncodedResponse =
   postProjectsWithUrlEncodedResponseSuccess
 
 export const getPostProjectsWithUrlEncodedUrl = () => {
-  return `http://localhost:3333/projects`
+  return `http://localhost:3333/projects/`
 }
 
 export const postProjectsWithUrlEncoded = async (
@@ -282,7 +282,7 @@ export type postProjectsWithFormDataResponse =
   postProjectsWithFormDataResponseSuccess
 
 export const getPostProjectsWithFormDataUrl = () => {
-  return `http://localhost:3333/projects`
+  return `http://localhost:3333/projects/`
 }
 
 export const postProjectsWithFormData = async (
@@ -407,8 +407,8 @@ export const getGetProjectsUrl = (params?: GetProjectsParams) => {
   const stringifiedParams = normalizedParams.toString()
 
   return stringifiedParams.length > 0
-    ? `http://localhost:3333/projects?${stringifiedParams}`
-    : `http://localhost:3333/projects`
+    ? `http://localhost:3333/projects/?${stringifiedParams}`
+    : `http://localhost:3333/projects/`
 }
 
 export const getProjects = async (
@@ -433,7 +433,7 @@ export const getProjects = async (
 
 export const getGetProjectsQueryKey = (params?: GetProjectsParams) => {
   return [
-    `http://localhost:3333/projects`,
+    `http://localhost:3333/projects/`,
     ...(params ? [params] : []),
   ] as const
 }
@@ -557,108 +557,6 @@ export function useGetProjects<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
-/**
- * Delete project
- */
-export type deleteProjectsByIdResponse200 = {
-  data: void
-  status: 200
-}
-
-export type deleteProjectsByIdResponseSuccess =
-  deleteProjectsByIdResponse200 & {
-    headers: Headers
-  }
-
-export type deleteProjectsByIdResponse = deleteProjectsByIdResponseSuccess
-
-export const getDeleteProjectsByIdUrl = (id: string) => {
-  return `http://localhost:3333/projects/${id}`
-}
-
-export const deleteProjectsById = async (
-  id: string,
-  options?: RequestInit,
-): Promise<deleteProjectsByIdResponse> => {
-  const res = await fetch(getDeleteProjectsByIdUrl(id), {
-    credentials: 'include',
-    ...options,
-    method: 'DELETE',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: deleteProjectsByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as deleteProjectsByIdResponse
-}
-
-export const getDeleteProjectsByIdMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteProjectsById>>,
-    TError,
-    { id: string },
-    TContext
-  >
-  fetch?: RequestInit
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteProjectsById>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  const mutationKey = ['deleteProjectsById']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteProjectsById>>,
-    { id: string }
-  > = (props) => {
-    const { id } = props ?? {}
-
-    return deleteProjectsById(id, fetchOptions)
-  }
-
-  return { mutationFn, ...mutationOptions }
-}
-
-export type DeleteProjectsByIdMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteProjectsById>>
->
-
-export type DeleteProjectsByIdMutationError = unknown
-
-export const useDeleteProjectsById = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteProjectsById>>,
-      TError,
-      { id: string },
-      TContext
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteProjectsById>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  return useMutation(getDeleteProjectsByIdMutationOptions(options), queryClient)
-}
 /**
  * Update a project
  */
@@ -1010,4 +908,106 @@ export const usePutProjectsByIdWithFormData = <
     getPutProjectsByIdWithFormDataMutationOptions(options),
     queryClient,
   )
+}
+/**
+ * Delete project
+ */
+export type deleteProjectsByIdResponse200 = {
+  data: void
+  status: 200
+}
+
+export type deleteProjectsByIdResponseSuccess =
+  deleteProjectsByIdResponse200 & {
+    headers: Headers
+  }
+
+export type deleteProjectsByIdResponse = deleteProjectsByIdResponseSuccess
+
+export const getDeleteProjectsByIdUrl = (id: string) => {
+  return `http://localhost:3333/projects/${id}`
+}
+
+export const deleteProjectsById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteProjectsByIdResponse> => {
+  const res = await fetch(getDeleteProjectsByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'DELETE',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: deleteProjectsByIdResponse['data'] = body ? JSON.parse(body) : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteProjectsByIdResponse
+}
+
+export const getDeleteProjectsByIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteProjectsById>>,
+    TError,
+    { id: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteProjectsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteProjectsById']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteProjectsById>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {}
+
+    return deleteProjectsById(id, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteProjectsByIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteProjectsById>>
+>
+
+export type DeleteProjectsByIdMutationError = unknown
+
+export const useDeleteProjectsById = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteProjectsById>>,
+      TError,
+      { id: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteProjectsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteProjectsByIdMutationOptions(options), queryClient)
 }

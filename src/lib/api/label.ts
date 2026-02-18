@@ -52,7 +52,7 @@ export type postLabelsWithJsonResponseSuccess =
 export type postLabelsWithJsonResponse = postLabelsWithJsonResponseSuccess
 
 export const getPostLabelsWithJsonUrl = () => {
-  return `http://localhost:3333/labels`
+  return `http://localhost:3333/labels/`
 }
 
 export const postLabelsWithJson = async (
@@ -157,7 +157,7 @@ export type postLabelsWithUrlEncodedResponse =
   postLabelsWithUrlEncodedResponseSuccess
 
 export const getPostLabelsWithUrlEncodedUrl = () => {
-  return `http://localhost:3333/labels`
+  return `http://localhost:3333/labels/`
 }
 
 export const postLabelsWithUrlEncoded = async (
@@ -279,7 +279,7 @@ export type postLabelsWithFormDataResponse =
   postLabelsWithFormDataResponseSuccess
 
 export const getPostLabelsWithFormDataUrl = () => {
-  return `http://localhost:3333/labels`
+  return `http://localhost:3333/labels/`
 }
 
 export const postLabelsWithFormData = async (
@@ -598,107 +598,6 @@ export function useGetLabelsByProjectId<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
-/**
- * Delete label
- */
-export type deleteLabelsByIdResponse200 = {
-  data: void
-  status: 200
-}
-
-export type deleteLabelsByIdResponseSuccess = deleteLabelsByIdResponse200 & {
-  headers: Headers
-}
-
-export type deleteLabelsByIdResponse = deleteLabelsByIdResponseSuccess
-
-export const getDeleteLabelsByIdUrl = (id: string) => {
-  return `http://localhost:3333/labels/${id}`
-}
-
-export const deleteLabelsById = async (
-  id: string,
-  options?: RequestInit,
-): Promise<deleteLabelsByIdResponse> => {
-  const res = await fetch(getDeleteLabelsByIdUrl(id), {
-    credentials: 'include',
-    ...options,
-    method: 'DELETE',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: deleteLabelsByIdResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as deleteLabelsByIdResponse
-}
-
-export const getDeleteLabelsByIdMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteLabelsById>>,
-    TError,
-    { id: string },
-    TContext
-  >
-  fetch?: RequestInit
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteLabelsById>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  const mutationKey = ['deleteLabelsById']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteLabelsById>>,
-    { id: string }
-  > = (props) => {
-    const { id } = props ?? {}
-
-    return deleteLabelsById(id, fetchOptions)
-  }
-
-  return { mutationFn, ...mutationOptions }
-}
-
-export type DeleteLabelsByIdMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteLabelsById>>
->
-
-export type DeleteLabelsByIdMutationError = unknown
-
-export const useDeleteLabelsById = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteLabelsById>>,
-      TError,
-      { id: string },
-      TContext
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteLabelsById>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  return useMutation(getDeleteLabelsByIdMutationOptions(options), queryClient)
-}
 /**
  * Update a label
  */
@@ -1048,4 +947,105 @@ export const usePutLabelsByIdWithFormData = <
     getPutLabelsByIdWithFormDataMutationOptions(options),
     queryClient,
   )
+}
+/**
+ * Delete label
+ */
+export type deleteLabelsByIdResponse200 = {
+  data: void
+  status: 200
+}
+
+export type deleteLabelsByIdResponseSuccess = deleteLabelsByIdResponse200 & {
+  headers: Headers
+}
+
+export type deleteLabelsByIdResponse = deleteLabelsByIdResponseSuccess
+
+export const getDeleteLabelsByIdUrl = (id: string) => {
+  return `http://localhost:3333/labels/${id}`
+}
+
+export const deleteLabelsById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteLabelsByIdResponse> => {
+  const res = await fetch(getDeleteLabelsByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'DELETE',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: deleteLabelsByIdResponse['data'] = body ? JSON.parse(body) : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteLabelsByIdResponse
+}
+
+export const getDeleteLabelsByIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLabelsById>>,
+    TError,
+    { id: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteLabelsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteLabelsById']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteLabelsById>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {}
+
+    return deleteLabelsById(id, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteLabelsByIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteLabelsById>>
+>
+
+export type DeleteLabelsByIdMutationError = unknown
+
+export const useDeleteLabelsById = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteLabelsById>>,
+      TError,
+      { id: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteLabelsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteLabelsByIdMutationOptions(options), queryClient)
 }
