@@ -9,10 +9,6 @@ import {
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core'
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from '@dnd-kit/sortable'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import KanbanColumn from '@/components/kanban/KanbanColumn'
 import { Plus } from 'lucide-react'
@@ -21,6 +17,7 @@ import {
   useGetColumns,
   getGetColumnsQueryKey,
   usePostColumnsWithJson,
+  usePostColumnsReorderWithJson,
   usePutColumnsByIdWithJson,
   useDeleteColumnsById,
 } from '@/lib/api/column'
@@ -35,8 +32,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
   const columns = useMemo(() => {
     return columnsResponse?.data.columns ?? []
   }, [columnsResponse])
-
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns])
 
   const { mutate: createColumn } = usePostColumnsWithJson({
     mutation: {
@@ -65,6 +60,8 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       }
     }
   })
+
+  const { mutateAsync: reorderColumns } = usePostColumnsReorderWithJson()
 
   // UI State
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
@@ -134,16 +131,45 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     const { active, over } = event
     if (!over) return
 
-    const activeId = active.id
-    const overId = over.id
-
-    if (activeId === overId) return
-
     const isActiveColumn = active.data.current?.type === 'Column'
     if (isActiveColumn) {
-      // TODO: Implement column reordering with backend
+      const activeColumnData = active.data.current?.column as Column
+      // over pode ser um droppable de coluna (id = column.id)
+      const overColumnId = over.id as string
+      if (activeColumnData.id === overColumnId) return
+
+      const queryKey = getGetColumnsQueryKey({ projectId })
+
+      // Snapshot antes do update otimista para reverter em caso de erro
+      const snapshot = queryClient.getQueryData(queryKey)
+
+      // Update otimista: move no cache
+      queryClient.setQueryData(queryKey, (old: any) => {
+        if (!old?.data?.columns) return old
+        const newColumns = [...old.data.columns] as Column[]
+        const activeIdx = newColumns.findIndex((c) => c.id === activeColumnData.id)
+        const overIdx = newColumns.findIndex((c) => c.id === overColumnId)
+        if (activeIdx === -1 || overIdx === -1) return old
+        const [moved] = newColumns.splice(activeIdx, 1)
+        newColumns.splice(overIdx, 0, moved)
+        const reordered = newColumns.map((c, i) => ({ ...c, order: i }))
+        return { ...old, data: { ...old.data, columns: reordered } }
+      })
+
+      reorderColumns({ data: { activeId: activeColumnData.id, overId: overColumnId } })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey })
+        })
+        .catch(() => {
+          // Reverte para o estado anterior em caso de erro
+          queryClient.setQueryData(queryKey, snapshot)
+        })
       return
     }
+
+    const activeId = active.id
+    const overId = over.id
+    if (activeId === overId) return
 
     const isColumn = columns.some((c) => c.id === overId)
     if (isColumn) {
@@ -169,10 +195,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
       >
         <ScrollArea className="flex-1">
           <div className="flex gap-5 pb-4 h-full">
-            <SortableContext
-              items={columnsId}
-              strategy={horizontalListSortingStrategy}
-            >
               {columns.map((column) => (
                 <KanbanColumn
                   key={column.id}
@@ -187,7 +209,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                   onDeleteColumn={handleDeleteColumn}
                 />
               ))}
-            </SortableContext>
             <button
               onClick={handleAddColumn}
               className="w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10

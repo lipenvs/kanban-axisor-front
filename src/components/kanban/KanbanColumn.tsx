@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/core'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus, MoreHorizontal, Pencil, Trash2, GripVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -37,7 +37,16 @@ export default function KanbanColumn({
     onEditColumn,
     onDeleteColumn,
 }: KanbanColumnProps) {
-    const { setNodeRef, isOver } = useDroppable({ id: column.id })
+    const { setNodeRef: setDroppableRef, isOver } = useDroppable({ id: column.id })
+    const {
+        attributes,
+        listeners,
+        setNodeRef: setDraggableRef,
+        isDragging,
+    } = useDraggable({
+        id: `column-drag-${column.id}`,
+        data: { type: 'Column', column },
+    })
 
     const sortedTasks = [...tasks].sort((a, b) => a.order - b.order)
     const taskIds = sortedTasks.map((t) => t.id)
@@ -46,10 +55,16 @@ export default function KanbanColumn({
         <div
             className={`
                 flex flex-col w-72 shrink-0 rounded-xl p-3 transition-colors duration-200 min-h-[200px]
-                ${isOver ? 'bg-slate-200 ring-2 ring-primary/20' : 'bg-gray-100'}
+                ${isOver ? 'bg-gray-200 shadow-inner' : 'bg-gray-100'}
+                ${isDragging ? 'opacity-50' : ''}
             `}
         >
-            <div className="flex items-center justify-between mb-3">
+            <div
+                ref={setDraggableRef}
+                {...listeners}
+                {...attributes}
+                className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing"
+            >
                 <div className="flex items-center gap-1.5">
                     <GripVertical className="w-4 h-4 text-muted-foreground" />
                     <h3 className="text-sm font-semibold text-foreground">{column.title}</h3>
@@ -83,7 +98,7 @@ export default function KanbanColumn({
             </div>
 
             <div
-                ref={setNodeRef}
+                ref={setDroppableRef}
                 className="flex-1"
             >
                 <ScrollArea className="h-full">
