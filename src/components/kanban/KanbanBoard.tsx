@@ -11,81 +11,87 @@ import {
 } from '@dnd-kit/core'
 import {
   SortableContext,
-  arrayMove,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import KanbanColumn from '@/components/kanban/KanbanColumn'
 import { Plus } from 'lucide-react'
 import ColumnDialog from './ColumnDialog'
-import type { Column, Task, Category, User } from '@/types'
+import {
+  useGetColumns,
+  getGetColumnsQueryKey,
+  usePostColumnsWithJson,
+  usePutColumnsByIdWithJson,
+  useDeleteColumnsById,
+} from '@/lib/api/column'
+import { useQueryClient } from '@tanstack/react-query'
+import type { Task, Category, User } from '@/types'
+import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 
-const INITIAL_COLUMNS: Column[] = [
-  { id: 'todo', title: 'A Fazer', color: '#6366F1' },
-  { id: 'doing', title: 'Em Progresso', color: '#F59E0B' },
-  { id: 'done', title: 'Concluído', color: '#10B981' },
-]
+export function KanbanBoard({ projectId }: { projectId: string }) {
+  const queryClient = useQueryClient()
+  const { data: columnsResponse } = useGetColumns({ projectId })
 
-const INITIAL_TASKS: Task[] = [
-  { id: '1', title: 'Criar layout do dashboard', columnId: 'todo', order: 0 },
-  { id: '2', title: 'Implementar autenticação', columnId: 'todo', order: 1 },
-  { id: '3', title: 'Configurar deploy', columnId: 'doing', order: 0 },
-  { id: '4', title: 'Escrever testes unitários', columnId: 'doing', order: 1 },
-  { id: '5', title: 'Definir schema do banco', columnId: 'done', order: 0 },
-]
+  const columns = useMemo(() => {
+    return columnsResponse?.data.columns ?? []
+  }, [columnsResponse])
 
-const INITIAL_CATEGORIES: Category[] = [
-  { id: 'cat-1', name: 'Frontend', color: '#6366f1' },
-  { id: 'cat-2', name: 'Backend', color: '#f59e0b' },
-  { id: 'cat-3', name: 'DevOps', color: '#22c55e' },
-]
-
-const INITIAL_USERS: User[] = [
-  { id: 'user-1', name: 'Felipe' },
-  { id: 'user-2', name: 'Ana' },
-]
-
-export function KanbanBoard() {
-  const [columns, setColumns] = useState(INITIAL_COLUMNS)
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns])
 
-  const [tasks, setTasks] = useState(INITIAL_TASKS)
-  const [categories] = useState(INITIAL_CATEGORIES)
-  const [users] = useState(INITIAL_USERS)
+  const { mutate: createColumn } = usePostColumnsWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
+        setColumnDialogOpen(false)
+        setEditingColumn(null)
+      }
+    }
+  })
+
+  const { mutate: updateColumn } = usePutColumnsByIdWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
+        setColumnDialogOpen(false)
+        setEditingColumn(null)
+      }
+    }
+  })
+
+  const { mutate: deleteColumn } = useDeleteColumnsById({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetColumnsQueryKey({ projectId }) })
+      }
+    }
+  })
+
+  // UI State
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
   const [activeColumn, setActiveColumn] = useState<Column | null>(null)
   const [columnDialogOpen, setColumnDialogOpen] = useState(false)
   const [editingColumn, setEditingColumn] = useState<Column | null>(null)
 
+  // TODO: Integrate Task/Category/User API
+  const tasks: Task[] = []
+  const categories: Category[] = []
+  const users: User[] = []
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   )
 
-  function handleColumnSubmit(title: string, color: string) {
+  function handleColumnSubmit(title: string) {
     if (editingColumn) {
-      setColumns((prev) =>
-        prev.map((c) => (c.id === editingColumn.id ? { ...c, title, color } : c))
-      )
+      updateColumn({ id: editingColumn.id, data: { title } })
     } else {
-      setColumns((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), title, color },
-      ])
+      createColumn({ data: { title, projectId } })
     }
   }
 
   function handleCreateTask(columnId: string) {
-    const id = crypto.randomUUID()
-    const columnTasks = tasks.filter((t) => t.columnId === columnId)
-    setTasks((prev) => [
-      ...prev,
-      {
-        id,
-        title: 'Nova tarefa',
-        columnId,
-        order: columnTasks.length,
-      },
-    ])
+    // TODO: Create task API
+    console.log('Create task', columnId)
   }
 
   function handleEditTask(task: Task) {
@@ -94,7 +100,8 @@ export function KanbanBoard() {
   }
 
   function handleDeleteTask(id: string) {
-    setTasks((prev) => prev.filter((t) => t.id !== id))
+    // TODO: Delete task API
+    console.log('Delete task', id)
   }
 
   function handleEditColumn(column: Column) {
@@ -108,8 +115,8 @@ export function KanbanBoard() {
   }
 
   function handleDeleteColumn(id: string) {
-    setColumns((prev) => prev.filter((c) => c.id !== id))
-    setTasks((prev) => prev.filter((t) => t.columnId !== id))
+    deleteColumn({ id })
+    // setTasks((prev) => prev.filter((t) => t.columnId !== id)) // Logic for tasks needs to be handled by backend cascade delete or frontend optimistic update, leaving for now as backend handles cascade delete for columns? Schema says cascade delete on project, but maybe not on tasks? Assuming tasks are deleted by backend.
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -134,29 +141,19 @@ export function KanbanBoard() {
 
     const isActiveColumn = active.data.current?.type === 'Column'
     if (isActiveColumn) {
-      setColumns((items) => {
-        const activeIndex = items.findIndex((item) => item.id === activeId)
-        const overIndex = items.findIndex((item) => item.id === overId)
-        return arrayMove(items, activeIndex, overIndex)
-      })
+      // TODO: Implement column reordering with backend
       return
     }
 
     const isColumn = columns.some((c) => c.id === overId)
     if (isColumn) {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === activeId ? { ...t, columnId: overId as string } : t))
-      )
+      // TODO: Move task to column API
       return
     }
 
     const overTask = tasks.find((t) => t.id === overId)
     if (overTask) {
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === activeId ? { ...t, columnId: overTask.columnId } : t
-        )
-      )
+      // TODO: Reorder task API
     }
   }
 
@@ -213,11 +210,11 @@ export function KanbanBoard() {
               tasks={tasks.filter((t) => t.columnId === activeColumn.id)}
               categories={categories}
               users={users}
+              onDeleteColumn={handleDeleteColumn}
               onCreateTask={handleCreateTask}
               onEditTask={handleEditTask}
               onDeleteTask={handleDeleteTask}
               onEditColumn={handleEditColumn}
-              onDeleteColumn={handleDeleteColumn}
             />
           ) : null}
           {activeTask ? (

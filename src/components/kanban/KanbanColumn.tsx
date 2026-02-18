@@ -10,7 +10,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import TaskCard from './TaskCard'
-import type { Column, Task, Category, User } from '@/types'
+import type { Task, Category, User } from '@/types'
+import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 import { Badge } from '../ui/badge'
 
 interface KanbanColumnProps {
@@ -18,9 +19,9 @@ interface KanbanColumnProps {
     tasks: Task[]
     categories: Category[]
     users: User[]
-    onCreateTask: (columnId: string) => void
-    onEditTask: (task: Task) => void
-    onDeleteTask: (id: string) => void
+    onCreateTask?: (columnId: string) => void
+    onEditTask?: (task: Task) => void
+    onDeleteTask?: (id: string) => void
     onEditColumn: (column: Column) => void
     onDeleteColumn: (id: string) => void
 }
@@ -94,23 +95,24 @@ export default function KanbanColumn({
                                     task={task}
                                     category={categories.find((c) => c.id === task.categoryId)}
                                     assignee={users.find((u) => u.id === task.assigneeId)}
-                                    onClick={() => onEditTask(task)}
-                                    onDelete={() => onDeleteTask(task.id)}
+                                    onClick={() => onEditTask?.(task)}
+                                    onDelete={() => onDeleteTask?.(task.id)}
                                 />
                             ))}
                         </div>
                     </SortableContext>
-
-                    <button
-                        onClick={() => onCreateTask(column.id)}
-                        className="w-full mt-2.5 flex items-center justify-center gap-1.5 py-2.5 rounded-lg
-              text-muted-foreground hover:text-foreground hover:bg-accent/50
-              border border-dashed border-border/50 hover:border-border
-              transition-all duration-200 text-sm"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Criar
-                    </button>
+                    {onCreateTask && (
+                        <button
+                            onClick={() => onCreateTask(column.id)}
+                            className="w-full mt-2.5 flex items-center justify-center gap-1.5 py-2.5 rounded-lg
+                  text-muted-foreground hover:text-foreground hover:bg-accent/50
+                  border border-dashed border-border/50 hover:border-border
+                  transition-all duration-200 text-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Criar
+                        </button>
+                    )}
                 </ScrollArea>
             </div>
         </div>

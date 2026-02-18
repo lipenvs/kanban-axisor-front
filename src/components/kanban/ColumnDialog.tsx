@@ -9,19 +9,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import type { Column } from '@/types'
-
-const COLUMN_COLORS = [
-    '#6366F1', '#3B82F6', '#06B6D4', '#10B981',
-    '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899',
-    '#64748B',
-]
+import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 
 interface ColumnDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    column?: Column | null
-    onSubmit: (title: string, color: string) => void
+    column?: Column | null // Use partial to allow local mock color if needed, but here we just need title and id
+    onSubmit: (title: string) => void
 }
 
 export default function ColumnDialog({
@@ -32,23 +26,20 @@ export default function ColumnDialog({
 }: ColumnDialogProps) {
     const isEditing = !!column
     const [title, setTitle] = useState('')
-    const [color, setColor] = useState(COLUMN_COLORS[0])
 
     useMemo(() => {
         if (open) {
             if (column) {
                 setTitle(column.title)
-                setColor(column.color)
             } else {
                 setTitle('')
-                setColor(COLUMN_COLORS[0])
             }
         }
     }, [open, column])
 
     function handleSubmit() {
         if (!title.trim()) return
-        onSubmit(title.trim(), color)
+        onSubmit(title.trim())
         onOpenChange(false)
     }
 

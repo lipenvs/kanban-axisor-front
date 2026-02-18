@@ -120,7 +120,7 @@ function TasksPage() {
         </Button>
       </div>
 
-      <KanbanBoard />
+      <KanbanBoard projectId={projectId} />
 
       <ConfirmDeleteDialog
         open={showDeleteDialog}
