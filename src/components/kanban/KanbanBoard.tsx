@@ -34,6 +34,11 @@ import {
 import {
   useGetLabelsByProjectId,
 } from '@/lib/api/label'
+import {
+  useGetAttachmentsByTasks,
+  getGetAttachmentsByTasksQueryKey,
+  postAttachmentsUploadByTaskIdWithFormData,
+} from '@/lib/api/attachment'
 import { useQueryClient } from '@tanstack/react-query'
 import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
@@ -59,6 +64,33 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
   const labels = useMemo(() => labelsResponse?.data.labels ?? [], [labelsResponse])
 
   const tasksQueryKey = getGetTasksQueryKey({ projectId })
+  const taskIds = useMemo(() => tasks.map((t) => t.id).join(','), [tasks])
+
+  const { data: attachmentsResponse } = useGetAttachmentsByTasks(
+    { taskIds },
+    {
+      query: {
+        enabled: tasks.length > 0,
+        refetchInterval: (query) => {
+          const data = query.state.data as any
+          const atts = data?.data?.attachments
+          if (!atts || atts.length === 0) return false
+          const hasPending = atts.some((a: any) => a.status === 'pending' || a.status === 'scanning')
+          return hasPending ? 2000 : false
+        },
+      },
+    },
+  )
+
+  const attachmentsByTask = useMemo(() => {
+    const atts = (attachmentsResponse?.data as any)?.attachments ?? []
+    const map: Record<string, any[]> = {}
+    for (const a of atts) {
+      if (!map[a.taskId]) map[a.taskId] = []
+      map[a.taskId].push(a)
+    }
+    return map
+  }, [attachmentsResponse])
 
   const { mutate: createColumn } = usePostColumnsWithJson({
     mutation: {
@@ -91,16 +123,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
   const { mutateAsync: reorderColumns } = usePostColumnsReorderWithJson()
 
-  const { mutate: createTask, isPending: isCreatingTask } = usePostTasksWithJson({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: tasksQueryKey })
-        setTaskDialogOpen(false)
-        setEditingTask(null)
-        setDefaultColumnId(null)
-      },
-    },
-  })
+  const { mutateAsync: createTask, isPending: isCreatingTask } = usePostTasksWithJson()
 
   const { mutate: updateTask, isPending: isUpdatingTask } = usePutTasksByIdWithJson({
     mutation: {
@@ -147,12 +170,22 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     setTaskDialogOpen(true)
   }
 
-  function handleTaskSubmit(data: {
+  async function uploadFiles(taskId: string, files: File[]) {
+    await Promise.all(
+      files.map((file) =>
+        postAttachmentsUploadByTaskIdWithFormData(taskId, { file })
+      )
+    )
+    queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTasksQueryKey() })
+  }
+
+  async function handleTaskSubmit(data: {
     title: string
     description?: string
     dueDate?: string | null
     labelId?: string | null
     assigneeId?: string | null
+    files?: File[]
   }) {
     const labelId = data.labelId ?? undefined
     const assigneeId = data.assigneeId ?? undefined
@@ -168,8 +201,11 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           assigneeId,
         },
       })
+      if (data.files?.length) {
+        uploadFiles(editingTask.id, data.files)
+      }
     } else if (defaultColumnId) {
-      createTask({
+      const result = await createTask({
         data: {
           title: data.title,
           description: data.description,
@@ -179,6 +215,14 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           assigneeId,
         },
       })
+      const taskId = result.data?.id
+      if (taskId && data.files?.length) {
+        await uploadFiles(taskId, data.files)
+      }
+      queryClient.invalidateQueries({ queryKey: tasksQueryKey })
+      setTaskDialogOpen(false)
+      setEditingTask(null)
+      setDefaultColumnId(null)
     }
   }
 
@@ -306,6 +350,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
                 column={column}
                 tasks={tasks.filter((t) => t.columnId === column.id)}
                 labels={labels}
+                attachmentsByTask={attachmentsByTask}
                 onCreateTask={handleCreateTask}
                 onEditTask={handleEditTask}
                 onDeleteTask={(id) => setDeleteTaskId(id)}

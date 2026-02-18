@@ -6,12 +6,6 @@
  * OpenAPI spec version: 0.0.0
  */
 
-/**
- * @nullable
- */
-export type GetTasks200TasksItemAssignee = {
-  id: string
-  name: string
-  /** @nullable */
-  image: string | null
-} | null
+export type PostAttachmentsUploadByTaskIdWithFormDataBodyThree = {
+  file: Blob
+}

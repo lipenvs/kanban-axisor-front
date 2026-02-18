@@ -5,7 +5,6 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
-import type { PutTasksByIdWithUrlEncoded200Assignee } from './putTasksByIdWithUrlEncoded200Assignee'
 
 export type PutTasksByIdWithUrlEncoded200 = {
   id: string
@@ -19,8 +18,4 @@ export type PutTasksByIdWithUrlEncoded200 = {
   dueDate?: unknown | null
   createdAt?: unknown | null
   updatedAt?: unknown | null
-  /** @nullable */
-  assigneeId?: string | null
-  /** @nullable */
-  assignee?: PutTasksByIdWithUrlEncoded200Assignee
 }

@@ -5,7 +5,6 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
-import type { PutTasksByIdWithJson200Assignee } from './putTasksByIdWithJson200Assignee'
 
 export type PutTasksByIdWithJson200 = {
   id: string
@@ -19,8 +18,4 @@ export type PutTasksByIdWithJson200 = {
   dueDate?: unknown | null
   createdAt?: unknown | null
   updatedAt?: unknown | null
-  /** @nullable */
-  assigneeId?: string | null
-  /** @nullable */
-  assignee?: PutTasksByIdWithJson200Assignee
 }

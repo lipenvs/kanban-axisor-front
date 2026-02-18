@@ -12,8 +12,16 @@ import { Progress } from '../ui/progress'
 interface TaskCardProps {
   task: GetTasks200TasksItem
   label?: GetLabelsByProjectId200LabelsItem
+  attachments?: { id: string; status: string }[]
   onClick?: () => void
   onDelete?: () => void
+}
+
+function getAttachmentProgress(attachments?: { status: string }[]): number | null {
+  if (!attachments || attachments.length === 0) return null
+  const statusValue: Record<string, number> = { pending: 0, scanning: 50, clean: 100, infected: 100, error: 100 }
+  const total = attachments.reduce((sum, a) => sum + (statusValue[a.status] ?? 0), 0)
+  return Math.round(total / attachments.length)
 }
 
 function formatDate(dateStr: unknown) {
@@ -22,7 +30,8 @@ function formatDate(dateStr: unknown) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
 }
 
-export default function TaskCard({ task, label, onClick, onDelete }: TaskCardProps) {
+export default function TaskCard({ task, label, attachments, onClick, onDelete }: TaskCardProps) {
+  const progress = getAttachmentProgress(attachments)
   const {
     setNodeRef,
     attributes,
@@ -85,7 +94,7 @@ export default function TaskCard({ task, label, onClick, onDelete }: TaskCardPro
         )}
       </div>
 
-      <Progress className="mt-4" value={66} />
+      {progress !== null && <Progress className="mt-4" value={progress} />}
 
       {(label || !!task.dueDate || session?.user) && (
         <div className="flex items-center justify-between mt-4">

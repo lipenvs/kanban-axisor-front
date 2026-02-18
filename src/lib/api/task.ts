@@ -184,15 +184,6 @@ export const postTasksWithUrlEncoded = async (
   ) {
     formUrlEncoded.append(`dueDate`, postTasksWithUrlEncodedBodyTwo.dueDate)
   }
-  if (
-    postTasksWithUrlEncodedBodyTwo.assigneeId !== undefined &&
-    postTasksWithUrlEncodedBodyTwo.assigneeId !== null
-  ) {
-    formUrlEncoded.append(
-      `assigneeId`,
-      postTasksWithUrlEncodedBodyTwo.assigneeId,
-    )
-  }
 
   const res = await fetch(getPostTasksWithUrlEncodedUrl(), {
     credentials: 'include',
@@ -323,12 +314,6 @@ export const postTasksWithFormData = async (
     postTasksWithFormDataBodyThree.dueDate !== null
   ) {
     formData.append(`dueDate`, postTasksWithFormDataBodyThree.dueDate)
-  }
-  if (
-    postTasksWithFormDataBodyThree.assigneeId !== undefined &&
-    postTasksWithFormDataBodyThree.assigneeId !== null
-  ) {
-    formData.append(`assigneeId`, postTasksWithFormDataBodyThree.assigneeId)
   }
 
   const res = await fetch(getPostTasksWithFormDataUrl(), {
@@ -745,15 +730,6 @@ export const putTasksByIdWithUrlEncoded = async (
       putTasksByIdWithUrlEncodedBodyTwo.order.toString(),
     )
   }
-  if (
-    putTasksByIdWithUrlEncodedBodyTwo.assigneeId !== undefined &&
-    putTasksByIdWithUrlEncodedBodyTwo.assigneeId !== null
-  ) {
-    formUrlEncoded.append(
-      `assigneeId`,
-      putTasksByIdWithUrlEncodedBodyTwo.assigneeId,
-    )
-  }
 
   const res = await fetch(getPutTasksByIdWithUrlEncodedUrl(id), {
     credentials: 'include',
@@ -897,12 +873,6 @@ export const putTasksByIdWithFormData = async (
   }
   if (putTasksByIdWithFormDataBodyThree.order !== undefined) {
     formData.append(`order`, putTasksByIdWithFormDataBodyThree.order.toString())
-  }
-  if (
-    putTasksByIdWithFormDataBodyThree.assigneeId !== undefined &&
-    putTasksByIdWithFormDataBodyThree.assigneeId !== null
-  ) {
-    formData.append(`assigneeId`, putTasksByIdWithFormDataBodyThree.assigneeId)
   }
 
   const res = await fetch(getPutTasksByIdWithFormDataUrl(id), {

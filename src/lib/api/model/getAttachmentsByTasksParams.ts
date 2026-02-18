@@ -6,12 +6,6 @@
  * OpenAPI spec version: 0.0.0
  */
 
-/**
- * @nullable
- */
-export type PostTasksWithUrlEncoded201Assignee = {
-  id: string
-  name: string
-  /** @nullable */
-  image: string | null
-} | null
+export type GetAttachmentsByTasksParams = {
+  taskIds?: string
+}

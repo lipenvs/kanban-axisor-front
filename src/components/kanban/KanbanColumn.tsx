@@ -19,6 +19,7 @@ interface KanbanColumnProps {
   column: Column
   tasks: GetTasks200TasksItem[]
   labels: GetLabelsByProjectId200LabelsItem[]
+  attachmentsByTask?: Record<string, any[]>
   onCreateTask?: (columnId: string) => void
   onEditTask?: (task: GetTasks200TasksItem) => void
   onDeleteTask?: (id: string) => void
@@ -30,6 +31,7 @@ export default function KanbanColumn({
   column,
   tasks,
   labels,
+  attachmentsByTask,
   onCreateTask,
   onEditTask,
   onDeleteTask,
@@ -103,6 +105,7 @@ export default function KanbanColumn({
                   key={task.id}
                   task={task}
                   label={labels.find((l) => l.id === task.labelId)}
+                  attachments={attachmentsByTask?.[task.id]}
                   onClick={() => onEditTask?.(task)}
                   onDelete={() => onDeleteTask?.(task.id)}
                 />

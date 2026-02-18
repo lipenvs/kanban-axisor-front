@@ -33,10 +33,18 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown } from 'lucide-react'
+import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown, ShieldCheck, ShieldAlert, Loader2, Download, Trash2 } from 'lucide-react'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
-import type { Attachment } from '@/types'
+import { useGetAttachmentsByTaskId, getGetAttachmentsByTaskIdQueryKey } from '@/lib/api/attachment'
+import { useQueryClient } from '@tanstack/react-query'
+
+interface LocalAttachment {
+  id: string
+  name: string
+  size: number
+  file: File
+}
 
 interface TaskDialogProps {
   open: boolean
@@ -49,6 +57,7 @@ interface TaskDialogProps {
     dueDate?: string | null
     labelId?: string | null
     assigneeId?: string | null
+    files?: File[]
   }) => void
   isPending?: boolean
 }
@@ -75,6 +84,30 @@ export default function TaskDialog({
 }: TaskDialogProps) {
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
+
+  const { data: existingAttachmentsData } = useGetAttachmentsByTaskId(
+    task?.id ?? '',
+    { query: { enabled: !!task?.id && open } },
+  )
+  const existingAttachments = (existingAttachmentsData?.data as any)?.attachments ?? []
+
+  async function handleDownload(attachmentId: string, fileName: string) {
+    const res = await fetch(`http://localhost:3333/attachments/download/${attachmentId}`, { credentials: 'include' })
+    const data = await res.json()
+    if (data.url) {
+      const link = document.createElement('a')
+      link.href = data.url
+      link.download = fileName
+      link.target = '_blank'
+      link.click()
+    }
+  }
+
+  async function handleDeleteAttachment(attachmentId: string) {
+    await fetch(`http://localhost:3333/attachments/${attachmentId}`, { method: 'DELETE', credentials: 'include' })
+    queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(task?.id ?? '') })
+  }
 
   const { data: sessionData } = useQuery({
     queryKey: ['session'],
@@ -90,7 +123,7 @@ export default function TaskDialog({
   const [dueDate, setDueDate] = useState('')
   const [labelId, setLabelId] = useState('')
   const [assignee, setAssignee] = useState('')
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [attachments, setAttachments] = useState<LocalAttachment[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
 
@@ -121,6 +154,7 @@ export default function TaskDialog({
       dueDate: dueDate || null,
       labelId: labelId || null,
       assigneeId: assignee,
+      files: attachments.length > 0 ? attachments.map((a) => a.file) : undefined,
     })
   }
 
@@ -132,6 +166,7 @@ export default function TaskDialog({
         id: crypto.randomUUID(),
         name: f.name,
         size: f.size,
+        file: f,
       }))
     setAttachments((prev) => [...prev, ...newAttachments])
   }
@@ -325,6 +360,54 @@ export default function TaskDialog({
                 onChange={(e) => handleFileSelect(e.target.files)}
               />
             </div>
+
+            {existingAttachments.length > 0 && (
+              <div className="space-y-2 mt-3">
+                {existingAttachments.map((att: any) => (
+                  <div
+                    key={att.id}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/40 group/att"
+                  >
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-red-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">
+                        {att.fileName}
+                      </p>
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatFileSize(att.fileSize)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {att.status === 'clean' ? (
+                        <ShieldCheck className="w-4 h-4 text-green-500" />
+                      ) : att.status === 'infected' || att.status === 'error' ? (
+                        <ShieldAlert className="w-4 h-4 text-red-500" />
+                      ) : (
+                        <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                        onClick={() => handleDownload(att.id, att.fileName)}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDeleteAttachment(att.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {attachments.length > 0 && (
               <div className="space-y-2 mt-3">
