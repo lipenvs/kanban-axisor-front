@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ConfirmDeleteDialog } from '@/components/dialogs/ConfirmDeleteDialog'
+import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
@@ -118,6 +119,8 @@ function TasksPage() {
           Excluir projeto
         </Button>
       </div>
+
+      <KanbanBoard />
 
       <ConfirmDeleteDialog
         open={showDeleteDialog}
