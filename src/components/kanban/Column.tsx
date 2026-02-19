@@ -36,7 +36,7 @@ const Column = ({ id, title, cards, onCreateTask, onDeleteTask, onEditTask, onEd
     <div
       ref={setNodeRef}
       className={`
-        flex flex-col w-72 shrink-0 rounded-xl p-3 transition-colors duration-200 min-h-[200px]
+        flex flex-col w-64 md:w-72 shrink-0 rounded-xl p-3 transition-colors duration-200 min-h-[200px]
         ${isOver ? 'bg-gray-200 shadow-inner' : 'bg-gray-100'}
       `}
     >

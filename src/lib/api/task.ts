@@ -427,7 +427,7 @@ export type getTasksResponseSuccess = getTasksResponse200 & {
 
 export type getTasksResponse = getTasksResponseSuccess
 
-export const getGetTasksUrl = (params?: GetTasksParams) => {
+export const getGetTasksUrl = (params: GetTasksParams) => {
   const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -444,7 +444,7 @@ export const getGetTasksUrl = (params?: GetTasksParams) => {
 }
 
 export const getTasks = async (
-  params?: GetTasksParams,
+  params: GetTasksParams,
   options?: RequestInit,
 ): Promise<getTasksResponse> => {
   const res = await fetch(getGetTasksUrl(params), {
@@ -467,7 +467,7 @@ export const getGetTasksQueryOptions = <
   TData = Awaited<ReturnType<typeof getTasks>>,
   TError = unknown,
 >(
-  params?: GetTasksParams,
+  params: GetTasksParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
@@ -499,7 +499,7 @@ export function useGetTasks<
   TData = Awaited<ReturnType<typeof getTasks>>,
   TError = unknown,
 >(
-  params: undefined | GetTasksParams,
+  params: GetTasksParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
@@ -522,7 +522,7 @@ export function useGetTasks<
   TData = Awaited<ReturnType<typeof getTasks>>,
   TError = unknown,
 >(
-  params?: GetTasksParams,
+  params: GetTasksParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
@@ -545,7 +545,7 @@ export function useGetTasks<
   TData = Awaited<ReturnType<typeof getTasks>>,
   TError = unknown,
 >(
-  params?: GetTasksParams,
+  params: GetTasksParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
@@ -561,7 +561,7 @@ export function useGetTasks<
   TData = Awaited<ReturnType<typeof getTasks>>,
   TError = unknown,
 >(
-  params?: GetTasksParams,
+  params: GetTasksParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>

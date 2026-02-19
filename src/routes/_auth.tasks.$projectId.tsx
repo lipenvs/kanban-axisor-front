@@ -58,13 +58,13 @@ function TasksPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col h-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
+        <div className="flex items-center gap-3 min-w-0">
           {editingName ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <Input
-                className="text-2xl font-bold h-10 w-72"
+                className="text-xl md:text-2xl font-bold h-10 w-full max-w-72"
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
                 onKeyDown={(e) => {
@@ -77,7 +77,7 @@ function TasksPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 shrink-0"
                 onClick={handleUpdateName}
                 disabled={isUpdating}
               >
@@ -86,7 +86,7 @@ function TasksPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 shrink-0"
                 onClick={() => setEditingName(false)}
                 disabled={isUpdating}
               >
@@ -95,16 +95,16 @@ function TasksPage() {
             </div>
           ) : (
             <div
-              className="flex items-center gap-2 group cursor-pointer"
+              className="flex items-center gap-2 group cursor-pointer min-w-0"
               onClick={() => {
                 setNameValue(projectName)
                 setEditingName(true)
               }}
             >
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">
                 {projectName}
               </h1>
-              <Pencil className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Pencil className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
           )}
         </div>
@@ -112,7 +112,7 @@ function TasksPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-destructive"
+          className="text-muted-foreground hover:text-destructive self-start sm:self-auto shrink-0"
           onClick={() => setShowDeleteDialog(true)}
         >
           <Trash2 className="w-4 h-4 mr-2" />

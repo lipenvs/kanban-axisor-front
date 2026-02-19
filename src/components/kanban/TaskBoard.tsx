@@ -205,7 +205,7 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
       onDragOver={handleDragOver}
     >
       <ScrollArea className="flex-1 w-full whitespace-nowrap">
-        <div className="flex w-max space-x-4">
+        <div className="flex w-max space-x-3 md:space-x-4 pb-4">
           {columns.map((column) => (
             <Column
               key={column.id}
@@ -221,7 +221,7 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
           ))}
           <button
             onClick={() => setIsColumnDialogOpen(true)}
-            className="w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10
+            className="w-64 md:w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10
                 rounded-xl border-2 border-dashed border-border/40 hover:border-border
                 text-muted-foreground hover:text-foreground
                 bg-muted/10 hover:bg-muted/30

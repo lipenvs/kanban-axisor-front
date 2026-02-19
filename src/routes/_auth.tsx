@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import { useQuery } from '@tanstack/react-query'
 import { Spinner } from '@/components/ui/spinner'
+import { SidebarProvider } from '@/components/SidebarContext'
 
 export const Route = createFileRoute('/_auth')({
   component: AuthLayout,
@@ -30,15 +31,17 @@ function AuthLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-sans antialiased flex">
-      <Sidebar />
+    <SidebarProvider>
+      <div className="min-h-screen bg-background font-sans antialiased flex">
+        <Sidebar />
 
-      <div className="flex-1 flex flex-col min-h-screen ml-[260px] transition-all duration-300 ease-in-out">
-        <Header />
-        <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
-        </main>
+        <div className="flex-1 flex flex-col min-h-screen lg:ml-[260px] transition-all duration-300 ease-in-out">
+          <Header />
+          <main className="flex-1 p-4 md:p-6 overflow-auto">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }
