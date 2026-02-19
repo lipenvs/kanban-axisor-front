@@ -12,7 +12,7 @@ import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useState } from 'react'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate, useParams, useMatchRoute } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
 import { useGetLabelsByProjectId, useDeleteLabelsById, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { CreateLabelDialog } from './kanban/dialogs/CreateLabelDialog'
@@ -29,6 +29,9 @@ export default function Sidebar() {
   const params = useParams({ strict: false }) as { projectId?: string }
   const selectedProjectId = params.projectId
   const { open, close } = useSidebar()
+  const matchRoute = useMatchRoute()
+  const isMembers = matchRoute({ to: '/members' })
+  const isTasks = !isMembers
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [labelToDelete, setLabelToDelete] = useState<{ id: string; name: string } | null>(null)
@@ -94,6 +97,7 @@ export default function Sidebar() {
               navigate({ to: '/tasks/$projectId', params: { projectId: val } })
               close()
             }}
+            disabled={!!isMembers}
           >
             <SelectTrigger className="w-full bg-muted/50 border-border/50 h-10">
               <SelectValue placeholder="Selecionar projeto" />
@@ -114,11 +118,27 @@ export default function Sidebar() {
         <Separator />
 
         <nav className="p-4 space-y-1">
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-accent text-accent-foreground text-sm font-medium transition-colors">
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isTasks ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}`}
+            onClick={() => {
+              if (selectedProjectId) {
+                navigate({ to: '/tasks/$projectId', params: { projectId: selectedProjectId } })
+              } else {
+                navigate({ to: '/tasks' })
+              }
+              close()
+            }}
+          >
             <LayoutDashboard className="w-4 h-4" />
             Tarefas
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground text-sm font-medium transition-colors">
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isMembers ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}`}
+            onClick={() => {
+              navigate({ to: '/members' })
+              close()
+            }}
+          >
             <Users className="w-4 h-4" />
             Membros
           </button>

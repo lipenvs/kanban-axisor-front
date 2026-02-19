@@ -1,4 +1,4 @@
-import { AddProjectDialog } from '@/components/kanban/dialogs/CreateProjectDialog'
+import { CreateProjectDialog } from '@/components/kanban/dialogs/CreateProjectDialog'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { FolderPlus } from 'lucide-react'
 import { useState } from 'react'
@@ -36,7 +36,7 @@ function TasksIndexPage() {
           Crie um novo projeto para começar.
         </p>
       </div>
-      <AddProjectDialog
+      <CreateProjectDialog
         open={showAddProject}
         onOpenChange={setShowAddProject}
       />

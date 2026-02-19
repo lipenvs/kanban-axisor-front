@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthMembersRouteImport } from './routes/_auth.members'
 import { Route as AuthTasksIndexRouteImport } from './routes/_auth.tasks.index'
 import { Route as AuthTasksProjectIdRouteImport } from './routes/_auth.tasks.$projectId'
 
@@ -41,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthMembersRoute = AuthMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthTasksIndexRoute = AuthTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/members': typeof AuthMembersRoute
   '/tasks/$projectId': typeof AuthTasksProjectIdRoute
   '/tasks/': typeof AuthTasksIndexRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/members': typeof AuthMembersRoute
   '/tasks/$projectId': typeof AuthTasksProjectIdRoute
   '/tasks': typeof AuthTasksIndexRoute
 }
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_auth/members': typeof AuthMembersRoute
   '/_auth/tasks/$projectId': typeof AuthTasksProjectIdRoute
   '/_auth/tasks/': typeof AuthTasksIndexRoute
 }
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/members'
     | '/tasks/$projectId'
     | '/tasks/'
   fileRoutesByTo: FileRoutesByTo
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/members'
     | '/tasks/$projectId'
     | '/tasks'
   id:
@@ -102,6 +113,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/_auth/members'
     | '/_auth/tasks/$projectId'
     | '/_auth/tasks/'
   fileRoutesById: FileRoutesById
@@ -151,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/members': {
+      id: '/_auth/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof AuthMembersRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/tasks/': {
       id: '/_auth/tasks/'
       path: '/tasks'
@@ -169,11 +188,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
+  AuthMembersRoute: typeof AuthMembersRoute
   AuthTasksProjectIdRoute: typeof AuthTasksProjectIdRoute
   AuthTasksIndexRoute: typeof AuthTasksIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthMembersRoute: AuthMembersRoute,
   AuthTasksProjectIdRoute: AuthTasksProjectIdRoute,
   AuthTasksIndexRoute: AuthTasksIndexRoute,
 }
