@@ -15,7 +15,10 @@ export type PutTasksByIdWithFormData200 = {
   labelId: string | null
   /** @nullable */
   description?: string | null
-  dueDate?: unknown | null
-  createdAt?: unknown | null
-  updatedAt?: unknown | null
+  /** @nullable */
+  dueDate?: string | null
+  /** @nullable */
+  createdAt?: string | null
+  /** @nullable */
+  updatedAt?: string | null
 }

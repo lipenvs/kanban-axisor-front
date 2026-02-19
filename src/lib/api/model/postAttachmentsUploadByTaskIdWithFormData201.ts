@@ -17,5 +17,6 @@ export type PostAttachmentsUploadByTaskIdWithFormData201 = {
   fileType: string
   storageKey: string
   status: PostAttachmentsUploadByTaskIdWithFormData201Status
-  createdAt?: unknown | null
+  /** @nullable */
+  createdAt?: string | null
 }

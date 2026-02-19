@@ -17,5 +17,6 @@ export type PostTasksWithJsonBodyOne = {
    */
   labelId?: string | null
   description?: string
-  dueDate?: unknown | null
+  /** @nullable */
+  dueDate?: string | null
 }

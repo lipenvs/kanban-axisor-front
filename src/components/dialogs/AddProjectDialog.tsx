@@ -4,6 +4,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -54,6 +55,9 @@ export function AddProjectDialog({
       <DialogContent className="sm:max-w-[360px]">
         <DialogHeader>
           <DialogTitle>Novo projeto</DialogTitle>
+          <DialogDescription className="sr-only">
+            Formulário para criar um novo projeto
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">

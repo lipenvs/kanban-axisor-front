@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
+import { useForm } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 import { auth } from '@/lib/auth'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -8,9 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -36,7 +43,12 @@ import { cn } from '@/lib/utils'
 import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown, ShieldCheck, ShieldAlert, Loader2, Download, Trash2 } from 'lucide-react'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
-import { useGetAttachmentsByTaskId, getGetAttachmentsByTaskIdQueryKey } from '@/lib/api/attachment'
+import {
+  useGetAttachmentsByTaskId,
+  getGetAttachmentsByTaskIdQueryKey,
+  useDeleteAttachmentsById,
+  getGetAttachmentsDownloadByIdUrl,
+} from '@/lib/api/attachment'
 import { useQueryClient } from '@tanstack/react-query'
 
 interface LocalAttachment {
@@ -62,16 +74,19 @@ interface TaskDialogProps {
   isPending?: boolean
 }
 
+const taskFormSchema = z.object({
+  title: z.string().min(1, 'Titulo é obrigatório'),
+  description: z.string(),
+  dueDate: z.string(),
+  labelId: z.string(),
+  assigneeId: z.string().min(1, 'Selecione um responsável'),
+  attachments: z.array(z.any()),
+})
+
 function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-function formatDateForInput(dateStr: unknown) {
-  if (!dateStr) return ''
-  const d = new Date(dateStr as string)
-  return d.toISOString().split('T')[0]
 }
 
 export default function TaskDialog({
@@ -82,6 +97,9 @@ export default function TaskDialog({
   onSubmit,
   isPending,
 }: TaskDialogProps) {
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [openCombobox, setOpenCombobox] = useState(false)
+
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -92,20 +110,10 @@ export default function TaskDialog({
   )
   const existingAttachments = (existingAttachmentsData?.data as any)?.attachments ?? []
 
-  async function handleDownload(attachmentId: string, fileName: string) {
-    const res = await fetch(`http://localhost:3333/attachments/download/${attachmentId}`, { credentials: 'include' })
-    const data = await res.json()
-    if (data.url) {
-      const link = document.createElement('a')
-      link.href = data.url
-      link.download = fileName
-      link.target = '_blank'
-      link.click()
-    }
-  }
+  const { mutateAsync: deleteAttachment } = useDeleteAttachmentsById()
 
   async function handleDeleteAttachment(attachmentId: string) {
-    await fetch(`http://localhost:3333/attachments/${attachmentId}`, { method: 'DELETE', credentials: 'include' })
+    await deleteAttachment({ id: attachmentId })
     queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(task?.id ?? '') })
   }
 
@@ -118,45 +126,42 @@ export default function TaskDialog({
   })
   const session = sessionData
 
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [labelId, setLabelId] = useState('')
-  const [assignee, setAssignee] = useState('')
-  const [attachments, setAttachments] = useState<LocalAttachment[]>([])
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [openCombobox, setOpenCombobox] = useState(false)
+  const form = useForm({
+    defaultValues: {
+      title: task?.title ?? '',
+      description: task?.description ?? '',
+      dueDate: task?.dueDate?.split('T')[0] ?? '',
+      labelId: task?.labelId ?? '',
+      assigneeId: session?.user?.id ?? '',
+      attachments: [] as LocalAttachment[],
+    },
+    validators: {
+      onSubmit: taskFormSchema,
+    },
+    onSubmit: ({ value }) => {
+      onSubmit({
+        title: value.title.trim(),
+        description: value.description.trim() || undefined,
+        dueDate: value.dueDate || null,
+        labelId: value.labelId || null,
+        assigneeId: value.assigneeId,
+        files: value.attachments.length > 0 ? value.attachments.map((a) => a.file) : undefined,
+      })
+    },
+  })
 
   useEffect(() => {
     if (open) {
-      if (task) {
-        setTitle(task.title)
-        setDescription(task.description ?? '')
-        setDueDate(formatDateForInput(task.dueDate))
-        setLabelId(task.labelId ?? '')
-        setAssignee(task.assigneeId ?? '')
-      } else {
-        setTitle('')
-        setDescription('')
-        setDueDate('')
-        setLabelId('')
-        setAssignee(session?.user?.id ?? '')
-      }
-      setAttachments([])
+      form.reset({
+        title: task?.title ?? '',
+        description: task?.description ?? '',
+        dueDate: task?.dueDate?.split('T')[0] ?? '',
+        labelId: task?.labelId ?? '',
+        assigneeId: session?.user?.id ?? '',
+        attachments: [],
+      })
     }
-  }, [open, task, labels, session])
-
-  function handleSubmit() {
-    if (!title.trim() || !assignee) return
-    onSubmit({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      dueDate: dueDate || null,
-      labelId: labelId || null,
-      assigneeId: assignee,
-      files: attachments.length > 0 ? attachments.map((a) => a.file) : undefined,
-    })
-  }
+  }, [open, task])
 
   function handleFileSelect(files: FileList | null) {
     if (!files) return
@@ -168,7 +173,7 @@ export default function TaskDialog({
         size: f.size,
         file: f,
       }))
-    setAttachments((prev) => [...prev, ...newAttachments])
+    form.setFieldValue('attachments', (prev) => [...prev, ...newAttachments])
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -192,107 +197,114 @@ export default function TaskDialog({
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEditing ? 'Formulário para editar uma tarefa existente' : 'Formulário para criar uma nova tarefa'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="task-title">Titulo</Label>
-            <Input
-              id="task-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: Implementar login"
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            />
-          </div>
+          <form.Field name="title">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor="task-title">Titulo</FieldLabel>
+                  <Input
+                    id="task-title"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    placeholder="Ex: Implementar login"
+                    aria-invalid={isInvalid}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        form.handleSubmit()
+                      }
+                    }}
+                  />
+                  {isInvalid && (
+                    <FieldError errors={field.state.meta.errors} />
+                  )}
+                </Field>
+              )
+            }}
+          </form.Field>
 
-          <div className="space-y-2">
-            <Label htmlFor="task-desc">Descricao</Label>
-            <textarea
-              id="task-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva a tarefa..."
-              rows={3}
-              className="border-input placeholder:text-muted-foreground dark:bg-input/30 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none"
-            />
-          </div>
+          <form.Field name="description">
+            {(field) => (
+              <Field>
+                <FieldLabel htmlFor="task-desc">Descricao</FieldLabel>
+                <textarea
+                  id="task-desc"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Descreva a tarefa..."
+                  rows={3}
+                  className="border-input placeholder:text-muted-foreground dark:bg-input/30 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none"
+                />
+              </Field>
+            )}
+          </form.Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="task-date">Data de Entrega</Label>
-              <Input
-                id="task-date"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Etiqueta</Label>
-              <Select value={labelId} onValueChange={(v) => setLabelId(v === '__none__' ? '' : v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Nenhuma" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">
-                    <span className="text-muted-foreground">Nenhuma</span>
-                  </SelectItem>
-                  {labels.map((l) => (
-                    <SelectItem key={l.id} value={l.id}>
-                      <span
-                        className="inline-block w-2 h-2 rounded-full mr-2"
-                        style={{ backgroundColor: l.color }}
-                      />
-                      {l.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <form.Field name="dueDate">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="task-date">Data de Entrega</FieldLabel>
+                  <Input
+                    id="task-date"
+                    type="date"
+                    value={field.state.value ?? ''}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="labelId">
+              {(field) => (
+                <Field>
+                  <FieldLabel>Etiqueta</FieldLabel>
+                  <Select value={field.state.value} onValueChange={(v) => field.handleChange(v === '__none__' ? '' : v)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Nenhuma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">
+                        <span className="text-muted-foreground">Nenhuma</span>
+                      </SelectItem>
+                      {labels.map((l) => (
+                        <SelectItem key={l.id} value={l.id}>
+                          <span
+                            className="inline-block w-2 h-2 rounded-full mr-2"
+                            style={{ backgroundColor: l.color }}
+                          />
+                          {l.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            </form.Field>
           </div>
 
-          <div className="space-y-2">
-            <Label>Responsável</Label>
-            <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openCombobox}
-                  className="w-full justify-between font-normal px-3"
-                >
-                  {assignee && session?.user && assignee === session.user.id ? (
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
-                          {session.user.name?.charAt(0) ?? 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{session.user.name}</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Selecione um responsável</span>
-                  )}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                <Command>
-                  <CommandInput placeholder="Procurar responsável..." />
-                  <CommandList>
-                    <CommandEmpty>Nenhum responsável encontrado.</CommandEmpty>
-                    <CommandGroup>
-                      {session?.user && (
-                        <CommandItem
-                          key={session.user.id}
-                          value={session.user.name ?? ''}
-                          onSelect={() => {
-                            setAssignee(session.user.id === assignee ? '' : session.user.id)
-                            setOpenCombobox(false)
-                          }}
-                        >
-                          <div className="flex items-center gap-2 flex-1">
+          <form.Field name="assigneeId">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel>Responsável</FieldLabel>
+                  <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openCombobox}
+                        className="w-full justify-between font-normal px-3"
+                      >
+                        {field.state.value && session?.user && field.state.value === session.user.id ? (
+                          <div className="flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                               <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
                                 {session.user.name?.charAt(0) ?? 'U'}
@@ -300,26 +312,61 @@ export default function TaskDialog({
                             </Avatar>
                             <span>{session.user.name}</span>
                           </div>
-                          <Check
-                            className={cn(
-                              "ml-auto h-4 w-4",
-                              assignee === session.user.id ? "opacity-100" : "opacity-0"
+                        ) : (
+                          <span className="text-muted-foreground">Selecione um responsável</span>
+                        )}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Procurar responsável..." />
+                        <CommandList>
+                          <CommandEmpty>Nenhum responsável encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {session?.user && (
+                              <CommandItem
+                                key={session.user.id}
+                                value={session.user.name ?? ''}
+                                onSelect={() => {
+                                  field.handleChange(session.user.id === field.state.value ? '' : session.user.id)
+                                  setOpenCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center gap-2 flex-1">
+                                  <Avatar className="h-6 w-6">
+                                    <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
+                                      {session.user.name?.charAt(0) ?? 'U'}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span>{session.user.name}</span>
+                                </div>
+                                <Check
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    field.state.value === session.user.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
                             )}
-                          />
-                        </CommandItem>
-                      )}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {isInvalid && (
+                    <FieldError errors={field.state.meta.errors} />
+                  )}
+                </Field>
+              )
+            }}
+          </form.Field>
 
           <div className="space-y-2">
-            <Label className="flex items-center gap-1.5">
+            <FieldLabel className="flex items-center gap-1.5">
               <Paperclip className="w-3.5 h-3.5" />
               Anexos (PDF)
-            </Label>
+            </FieldLabel>
 
             <div
               onDragOver={handleDragOver}
@@ -391,9 +438,15 @@ export default function TaskDialog({
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
-                        onClick={() => handleDownload(att.id, att.fileName)}
+                        asChild
                       >
-                        <Download className="w-3.5 h-3.5" />
+                        <a
+                          href={getGetAttachmentsDownloadByIdUrl(att.id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </a>
                       </Button>
                       <Button
                         variant="ghost"
@@ -409,36 +462,38 @@ export default function TaskDialog({
               </div>
             )}
 
-            {attachments.length > 0 && (
-              <div className="space-y-2 mt-3">
-                {attachments.map((attachment) => (
-                  <div
-                    key={attachment.id}
-                    className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/40 group/att"
-                  >
-                    <div className="shrink-0 w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-red-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-foreground truncate">
-                        {attachment.name}
-                      </p>
-                      <span className="text-[10px] text-muted-foreground">
-                        {formatFileSize(attachment.size)}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                      onClick={() => setAttachments((prev) => prev.filter((a) => a.id !== attachment.id))}
+            <form.Field name="attachments">
+              {(field) => field.state.value.length > 0 && (
+                <div className="space-y-2 mt-3">
+                  {field.state.value.map((attachment) => (
+                    <div
+                      key={attachment.id}
+                      className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/40 group/att"
                     >
-                      <X className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
+                      <div className="shrink-0 w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-red-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-foreground truncate">
+                          {attachment.name}
+                        </p>
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatFileSize(attachment.size)}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        onClick={() => field.handleChange(field.state.value.filter((a) => a.id !== attachment.id))}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form.Field>
           </div>
         </div>
 
@@ -446,7 +501,7 @@ export default function TaskDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={isPending || !title.trim() || !assignee}>
+          <Button onClick={() => form.handleSubmit()} disabled={isPending}>
             {isEditing ? 'Salvar' : 'Criar'}
           </Button>
         </DialogFooter>

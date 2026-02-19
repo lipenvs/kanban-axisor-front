@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +15,7 @@ import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 interface ColumnDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    column?: Column | null // Use partial to allow local mock color if needed, but here we just need title and id
+    column?: Column | null
     onSubmit: (title: string) => void
 }
 
@@ -27,13 +28,9 @@ export default function ColumnDialog({
     const isEditing = !!column
     const [title, setTitle] = useState('')
 
-    useMemo(() => {
+    useEffect(() => {
         if (open) {
-            if (column) {
-                setTitle(column.title)
-            } else {
-                setTitle('')
-            }
+            setTitle(column?.title ?? '')
         }
     }, [open, column])
 
@@ -48,6 +45,9 @@ export default function ColumnDialog({
             <DialogContent className="sm:max-w-[360px]">
                 <DialogHeader>
                     <DialogTitle>{isEditing ? 'Editar coluna' : 'Nova coluna'}</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        {isEditing ? 'Formulário para editar o nome da coluna' : 'Formulário para criar uma nova coluna'}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">

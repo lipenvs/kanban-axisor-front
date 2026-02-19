@@ -188,7 +188,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     files?: File[]
   }) {
     const labelId = data.labelId ?? undefined
-    const assigneeId = data.assigneeId ?? undefined
 
     if (editingTask) {
       updateTask({
@@ -198,7 +197,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           description: data.description,
           dueDate: data.dueDate,
           labelId,
-          assigneeId,
         },
       })
       if (data.files?.length) {
@@ -212,7 +210,6 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           dueDate: data.dueDate,
           labelId: labelId!,
           columnId: defaultColumnId,
-          assigneeId,
         },
       })
       const taskId = result.data?.id

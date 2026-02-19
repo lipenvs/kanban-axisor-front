@@ -5,6 +5,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -63,6 +64,9 @@ export function EditLabelDialog({
       <DialogContent className="sm:max-w-[360px]">
         <DialogHeader>
           <DialogTitle>Editar etiqueta</DialogTitle>
+          <DialogDescription className="sr-only">
+            Formulário para editar o nome e a cor da etiqueta
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">

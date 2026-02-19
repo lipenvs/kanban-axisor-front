@@ -16,7 +16,8 @@ export type PutTasksByIdWithUrlEncodedBodyTwo = {
    */
   labelId?: string | null
   description?: string
-  dueDate?: unknown | null
+  /** @nullable */
+  dueDate?: string | null
   /**
    * @minimum -9007199254740991
    * @maximum 9007199254740991

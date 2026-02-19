@@ -17,5 +17,6 @@ export type GetAttachmentsByTasks200AttachmentsItem = {
   fileType: string
   storageKey: string
   status: GetAttachmentsByTasks200AttachmentsItemStatus
-  createdAt?: unknown | null
+  /** @nullable */
+  createdAt?: string | null
 }

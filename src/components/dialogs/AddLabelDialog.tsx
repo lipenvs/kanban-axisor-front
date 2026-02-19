@@ -5,6 +5,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -55,6 +56,9 @@ export function AddLabelDialog({
       <DialogContent className="sm:max-w-[360px]">
         <DialogHeader>
           <DialogTitle>Nova etiqueta</DialogTitle>
+          <DialogDescription className="sr-only">
+            Formulário para criar uma nova etiqueta
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">

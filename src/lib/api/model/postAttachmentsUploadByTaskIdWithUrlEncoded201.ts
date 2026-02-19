@@ -17,5 +17,6 @@ export type PostAttachmentsUploadByTaskIdWithUrlEncoded201 = {
   fileType: string
   storageKey: string
   status: PostAttachmentsUploadByTaskIdWithUrlEncoded201Status
-  createdAt?: unknown | null
+  /** @nullable */
+  createdAt?: string | null
 }
