@@ -9,10 +9,9 @@ import { Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Column from "./Column";
 import Card from "./Card";
-import { useTaskBoardDragAndDrop } from "./useTaskBoardDragAndDrop";
 import ColumnDialog from "./ColumnDialog";
 import TaskDialog from "./TaskDialog";
-import { ConfirmDeleteDialog } from "../dialogs/ConfirmDeleteDialog";
+import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useState } from "react";
 
 const dropAnimation: DropAnimation = {
@@ -29,6 +28,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
+import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 
 interface TaskBoardProps {
   projectId: string;
@@ -49,13 +49,14 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
 
   const {
     columns,
-    activeId,
     sensors,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     getActiveCard,
   } = useTaskBoardDragAndDrop(kanbanData?.data ?? []);
+
+  const activeCard = getActiveCard();
 
   const { mutate: createColumn } = usePostColumnsWithJson();
   const { mutate: createTask } = usePostTasksWithJson();
@@ -233,19 +234,7 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <DragOverlay dropAnimation={dropAnimation}>
-        {activeId ? (
-          <Card
-            id={activeId as string}
-            title={getActiveCard()?.title ?? ""}
-            order={getActiveCard()?.order ?? "0"}
-            columnId={getActiveCard()?.columnId ?? ""}
-            labelId={getActiveCard()?.labelId ?? null}
-            assigneeId={getActiveCard()?.assigneeId ?? null}
-            label={getActiveCard()?.label}
-            assignee={getActiveCard()?.assignee}
-            dueDate={getActiveCard()?.dueDate}
-          />
-        ) : null}
+        {activeCard ? <Card card={activeCard} /> : null}
       </DragOverlay>
 
       <ColumnDialog

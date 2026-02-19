@@ -6,10 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '../ui/dialog'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
+} from '../../ui/dialog'
+import { Label } from '../../ui/label'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
 import { usePostLabelsWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -18,17 +18,17 @@ const CATEGORY_COLORS = [
   '#EC4899', '#06B6D4', '#84CC16',
 ]
 
-interface AddLabelDialogProps {
+interface CreateLabelDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: string
 }
 
-export function AddLabelDialog({
+export function CreateLabelDialog({
   open,
   onOpenChange,
   projectId,
-}: AddLabelDialogProps) {
+}: CreateLabelDialogProps) {
   const [newLabelName, setNewLabelName] = useState('')
   const [newLabelColor, setNewLabelColor] = useState(CATEGORY_COLORS[0])
   const queryClient = useQueryClient()

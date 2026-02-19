@@ -10,7 +10,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 
 interface ColumnDialogProps {
     open: boolean

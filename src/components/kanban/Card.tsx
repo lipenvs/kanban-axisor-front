@@ -8,14 +8,15 @@ import type { GetColumnsKanban200ItemCardsItem } from "../../lib/api/model/getCo
 
 export type CardType = GetColumnsKanban200ItemCardsItem;
 
-interface CardProps extends CardType {
+interface CardProps {
+  card: CardType;
   onDelete?: () => void;
   onClick?: () => void;
 }
 
-const Card = ({ id, title, label, dueDate, assignee, onDelete, onClick }: CardProps) => {
+const Card = ({ card, onDelete, onClick }: CardProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useSortable({
-    id: id
+    id: card.id
   });
 
   const style = {
@@ -38,7 +39,7 @@ const Card = ({ id, title, label, dueDate, assignee, onDelete, onClick }: CardPr
     >
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-sm font-medium text-foreground leading-snug line-clamp-2">
-          {title}
+          {card.title}
         </h4>
         {onDelete && (
           <Button
@@ -58,27 +59,27 @@ const Card = ({ id, title, label, dueDate, assignee, onDelete, onClick }: CardPr
 
       <div className="flex items-center justify-between mt-4">
         <div className="flex items-center gap-2">
-          {label && (
+          {card.label && (
             <div
               className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border"
-              style={{ borderColor: label.color, color: label.color }}
+              style={{ borderColor: card.label.color, color: card.label.color }}
             >
-              {label.name}
+              {card.label.name}
             </div>
           )}
 
-          {dueDate && (
+          {card.dueDate && (
             <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
               <Calendar className="w-3 h-3" />
-              {new Date(dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+              {new Date(card.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
             </span>
           )}
         </div>
 
         <Avatar className="h-6 w-6">
-          {assignee ? (
+          {card.assignee ? (
             <AvatarFallback className="bg-indigo-600 text-white text-[10px] font-semibold">
-              {assignee.name.charAt(0).toUpperCase()}
+              {card.assignee.name.charAt(0).toUpperCase()}
             </AvatarFallback>
           ) : (
             <AvatarFallback className="bg-gray-200 text-gray-500 text-[10px] font-semibold">

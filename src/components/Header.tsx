@@ -13,7 +13,7 @@ import {
 } from './ui/dropdown-menu'
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
-import { AddProjectDialog } from './dialogs/AddProjectDialog'
+import { CreateProjectDialog } from './kanban/dialogs/CreateProjectDialog'
 
 export default function Header() {
   const navigate = useNavigate()
@@ -99,7 +99,7 @@ export default function Header() {
         </div>
       </div>
 
-      <AddProjectDialog
+      <CreateProjectDialog
         open={showAddProject}
         onOpenChange={setShowAddProject}
       />

@@ -15,9 +15,9 @@ import { useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
 import { useGetLabelsByProjectId, useDeleteLabelsById, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
-import { AddLabelDialog } from './dialogs/AddLabelDialog'
-import { EditLabelDialog } from './dialogs/EditLabelDialog'
-import { ConfirmDeleteDialog } from './dialogs/ConfirmDeleteDialog'
+import { CreateLabelDialog } from './kanban/dialogs/CreateLabelDialog'
+import { EditLabelDialog } from './kanban/dialogs/EditLabelDialog'
+import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 import { useQueryClient } from '@tanstack/react-query'
 
 export default function Sidebar() {
@@ -184,7 +184,7 @@ export default function Sidebar() {
       </div>
 
       {selectedProjectId && (
-        <AddLabelDialog
+        <CreateLabelDialog
           open={showAddLabel}
           onOpenChange={setShowAddLabel}
           projectId={selectedProjectId}

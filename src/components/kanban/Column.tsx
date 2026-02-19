@@ -78,11 +78,7 @@ const Column = ({ id, title, cards, onCreateTask, onDeleteTask, onEditTask, onEd
               {cards.map((card) => (
                 <Card
                   key={card.id}
-                  id={card.id}
-                  title={card.title}
-                  label={card.label}
-                  dueDate={card.dueDate}
-                  assignee={card.assignee}
+                  card={card}
                   onDelete={() => onDeleteTask(card.id)}
                   onClick={() => onEditTask(card.id)}
                 />

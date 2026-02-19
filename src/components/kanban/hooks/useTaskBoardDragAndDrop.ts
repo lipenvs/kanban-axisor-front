@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
-import type { ColumnType } from "./Column";
+import type { ColumnType } from "../Column";
 
 export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   const [columns, setColumns] = useState<ColumnType[]>(initialData);

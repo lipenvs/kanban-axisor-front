@@ -5,25 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '../ui/dialog'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
+} from '../../ui/dialog'
+import { Label } from '../../ui/label'
+import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { getGetProjectsQueryKey, usePostProjectsWithJson } from '@/lib/api/project'
 
-interface AddProjectDialogProps {
+interface CreateProjectDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function AddProjectDialog({
+export function CreateProjectDialog({
   open,
   onOpenChange,
-}: AddProjectDialogProps) {
+}: CreateProjectDialogProps) {
   const [name, setName] = useState('')
   const queryClient = useQueryClient()
   const navigate = useNavigate()

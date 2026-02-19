@@ -5,8 +5,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog'
-import { Button } from '../ui/button'
+} from './ui/dialog'
+import { Button } from './ui/button'
 import { Loader2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
