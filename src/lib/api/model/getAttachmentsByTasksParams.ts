@@ -7,5 +7,5 @@
  */
 
 export type GetAttachmentsByTasksParams = {
-  taskIds?: string
+  taskIds?: string | string[]
 }

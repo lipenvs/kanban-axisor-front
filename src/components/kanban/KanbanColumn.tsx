@@ -49,7 +49,7 @@ export default function KanbanColumn({
     data: { type: 'Column', column },
   })
 
-  const sortedTasks = [...tasks].sort((a, b) => a.order - b.order)
+  const sortedTasks = [...tasks].sort((a, b) => String(a.order).localeCompare(String(b.order)))
   const taskIds = sortedTasks.map((t) => t.id)
 
   return (
