@@ -13,6 +13,11 @@ import ColumnDialog from "./ColumnDialog";
 import TaskDialog from "./TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
+import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
+import { useGetLabelsByProjectId } from "../../lib/api/label";
+import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -24,28 +29,22 @@ const dropAnimation: DropAnimation = {
   }),
 };
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
-import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
-import { useGetLabelsByProjectId } from "../../lib/api/label";
-import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
-
 interface TaskBoardProps {
   projectId: string;
 }
 
 export default function TaskBoard({ projectId }: TaskBoardProps) {
-  const queryClient = useQueryClient();
-  const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsKanban({ projectId });
-  const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
-  const { data: labelsData } = useGetLabelsByProjectId(projectId);
-
   const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [createTaskColumnId, setCreateTaskColumnId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [deletingColumnId, setDeletingColumnId] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
+  const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsKanban({ projectId });
+  const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
+  const { data: labelsData } = useGetLabelsByProjectId(projectId);
 
   const {
     columns,
