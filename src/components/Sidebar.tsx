@@ -144,9 +144,9 @@ export default function Sidebar() {
           </button>
         </nav>
 
-        <Separator />
+        {!isMembers && <Separator />}
 
-        <div className="p-4 flex-1 flex flex-col min-h-0">
+        {!isMembers && <div className="p-4 flex-1 flex flex-col min-h-0">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Etiquetas
@@ -217,7 +217,7 @@ export default function Sidebar() {
               ))}
             </div>
           </ScrollArea>
-        </div>
+        </div>}
 
         {selectedProjectId && (
           <CreateLabelDialog
