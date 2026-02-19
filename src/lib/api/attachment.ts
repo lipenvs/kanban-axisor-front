@@ -23,14 +23,22 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import type {
+  DeleteAttachmentsById200,
+  GetAttachmentsByTaskId200,
+  GetAttachmentsByTasks200,
   GetAttachmentsByTasksParams,
+  GetAttachmentsDownloadById200,
+  GetAttachmentsDownloadById404,
+  PostAttachmentsUploadByTaskIdWithFormData201,
   PostAttachmentsUploadByTaskIdWithFormDataBodyThree,
+  PostAttachmentsUploadByTaskIdWithJson201,
   PostAttachmentsUploadByTaskIdWithJsonBodyOne,
+  PostAttachmentsUploadByTaskIdWithUrlEncoded201,
   PostAttachmentsUploadByTaskIdWithUrlEncodedBodyTwo,
 } from './model'
 
 export type postAttachmentsUploadByTaskIdWithJsonResponse201 = {
-  data: void
+  data: PostAttachmentsUploadByTaskIdWithJson201
   status: 201
 }
 
@@ -142,7 +150,7 @@ export const usePostAttachmentsUploadByTaskIdWithJson = <
   )
 }
 export type postAttachmentsUploadByTaskIdWithUrlEncodedResponse201 = {
-  data: void
+  data: PostAttachmentsUploadByTaskIdWithUrlEncoded201
   status: 201
 }
 
@@ -279,7 +287,7 @@ export const usePostAttachmentsUploadByTaskIdWithUrlEncoded = <
   )
 }
 export type postAttachmentsUploadByTaskIdWithFormDataResponse201 = {
-  data: void
+  data: PostAttachmentsUploadByTaskIdWithFormData201
   status: 201
 }
 
@@ -408,7 +416,7 @@ export const usePostAttachmentsUploadByTaskIdWithFormData = <
   )
 }
 export type getAttachmentsByTaskIdResponse200 = {
-  data: void
+  data: GetAttachmentsByTaskId200
   status: 200
 }
 
@@ -597,7 +605,7 @@ export function useGetAttachmentsByTaskId<
 }
 
 export type getAttachmentsByTasksResponse200 = {
-  data: void
+  data: GetAttachmentsByTasks200
   status: 200
 }
 
@@ -795,4 +803,308 @@ export function useGetAttachmentsByTasks<
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 
   return { ...query, queryKey: queryOptions.queryKey }
+}
+
+export type getAttachmentsDownloadByIdResponse200 = {
+  data: GetAttachmentsDownloadById200
+  status: 200
+}
+
+export type getAttachmentsDownloadByIdResponse404 = {
+  data: GetAttachmentsDownloadById404
+  status: 404
+}
+
+export type getAttachmentsDownloadByIdResponseSuccess =
+  getAttachmentsDownloadByIdResponse200 & {
+    headers: Headers
+  }
+export type getAttachmentsDownloadByIdResponseError =
+  getAttachmentsDownloadByIdResponse404 & {
+    headers: Headers
+  }
+
+export type getAttachmentsDownloadByIdResponse =
+  | getAttachmentsDownloadByIdResponseSuccess
+  | getAttachmentsDownloadByIdResponseError
+
+export const getGetAttachmentsDownloadByIdUrl = (id: string) => {
+  return `http://localhost:3333/attachments/download/${id}`
+}
+
+export const getAttachmentsDownloadById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getAttachmentsDownloadByIdResponse> => {
+  const res = await fetch(getGetAttachmentsDownloadByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'GET',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: getAttachmentsDownloadByIdResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAttachmentsDownloadByIdResponse
+}
+
+export const getGetAttachmentsDownloadByIdQueryKey = (id: string) => {
+  return [`http://localhost:3333/attachments/download/${id}`] as const
+}
+
+export const getGetAttachmentsDownloadByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+  TError = GetAttachmentsDownloadById404,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAttachmentsDownloadByIdQueryKey(id)
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAttachmentsDownloadById>>
+  > = ({ signal }) =>
+    getAttachmentsDownloadById(id, { signal, ...fetchOptions })
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAttachmentsDownloadByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAttachmentsDownloadById>>
+>
+export type GetAttachmentsDownloadByIdQueryError = GetAttachmentsDownloadById404
+
+export function useGetAttachmentsDownloadById<
+  TData = Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+  TError = GetAttachmentsDownloadById404,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+          TError,
+          Awaited<ReturnType<typeof getAttachmentsDownloadById>>
+        >,
+        'initialData'
+      >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetAttachmentsDownloadById<
+  TData = Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+  TError = GetAttachmentsDownloadById404,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+          TError,
+          Awaited<ReturnType<typeof getAttachmentsDownloadById>>
+        >,
+        'initialData'
+      >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetAttachmentsDownloadById<
+  TData = Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+  TError = GetAttachmentsDownloadById404,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+
+export function useGetAttachmentsDownloadById<
+  TData = Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+  TError = GetAttachmentsDownloadById404,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAttachmentsDownloadById>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+} {
+  const queryOptions = getGetAttachmentsDownloadByIdQueryOptions(id, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+
+  return { ...query, queryKey: queryOptions.queryKey }
+}
+
+export type deleteAttachmentsByIdResponse200 = {
+  data: DeleteAttachmentsById200
+  status: 200
+}
+
+export type deleteAttachmentsByIdResponseSuccess =
+  deleteAttachmentsByIdResponse200 & {
+    headers: Headers
+  }
+
+export type deleteAttachmentsByIdResponse = deleteAttachmentsByIdResponseSuccess
+
+export const getDeleteAttachmentsByIdUrl = (id: string) => {
+  return `http://localhost:3333/attachments/${id}`
+}
+
+export const deleteAttachmentsById = async (
+  id: string,
+  options?: RequestInit,
+): Promise<deleteAttachmentsByIdResponse> => {
+  const res = await fetch(getDeleteAttachmentsByIdUrl(id), {
+    credentials: 'include',
+    ...options,
+    method: 'DELETE',
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: deleteAttachmentsByIdResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteAttachmentsByIdResponse
+}
+
+export const getDeleteAttachmentsByIdMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAttachmentsById>>,
+    TError,
+    { id: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteAttachmentsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteAttachmentsById']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteAttachmentsById>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {}
+
+    return deleteAttachmentsById(id, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteAttachmentsByIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteAttachmentsById>>
+>
+
+export type DeleteAttachmentsByIdMutationError = unknown
+
+export const useDeleteAttachmentsById = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteAttachmentsById>>,
+      TError,
+      { id: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteAttachmentsById>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(
+    getDeleteAttachmentsByIdMutationOptions(options),
+    queryClient,
+  )
 }
