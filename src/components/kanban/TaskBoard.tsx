@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
+import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 
 const dropAnimation: DropAnimation = {
@@ -73,7 +74,16 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
     );
   };
 
-  const handleCreateOrUpdateTask = (data: { title: string; description?: string; dueDate?: string | null; labelId?: string | null; assigneeId?: string | null }) => {
+  async function uploadFiles(taskId: string, files: File[]) {
+    await Promise.all(
+      files.map((file) =>
+        postAttachmentsUploadByTaskIdWithFormData(taskId, { file })
+      )
+    );
+    queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(taskId) });
+  }
+
+  const handleCreateOrUpdateTask = (data: { title: string; description?: string; dueDate?: string | null; labelId?: string | null; assigneeId?: string | null; files?: File[] }) => {
     if (editingTaskId) {
       updateTask(
         {
@@ -84,13 +94,13 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
             dueDate: data.dueDate,
             labelId: data.labelId,
             assigneeId: data.assigneeId,
-            // columnId is required by the type but shouldn't change here unless we want to move it. 
-            // We need to find the current columnId.
-            columnId: tasksData?.data.tasks.find(t => t.id === editingTaskId)?.columnId ?? "",
           }
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            if (data.files && data.files.length > 0) {
+              await uploadFiles(editingTaskId, data.files);
+            }
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setEditingTaskId(null);
@@ -110,7 +120,10 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
           }
         },
         {
-          onSuccess: () => {
+          onSuccess: async (response) => {
+            if (data.files && data.files.length > 0) {
+              await uploadFiles(response.data.id, data.files);
+            }
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setCreateTaskColumnId(null);
