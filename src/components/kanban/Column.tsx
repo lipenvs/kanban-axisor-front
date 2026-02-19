@@ -1,5 +1,5 @@
-import { verticalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import { verticalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GripVertical, Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -24,23 +24,39 @@ interface ColumnProps extends ColumnType {
 }
 
 const Column = ({ id, title, cards, onCreateTask, onDeleteTask, onEditTask, onEditColumn, onDeleteColumn }: ColumnProps) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id: id,
-    data: {
-      type: "Column",
-      column: { id, title, cards }
-    }
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({
+    id,
+    data: { type: "Column", column: { id, title, cards } },
   });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
 
   return (
     <div
       ref={setNodeRef}
+      style={style}
       className={`
         flex flex-col w-64 md:w-72 shrink-0 rounded-xl p-3 transition-colors duration-200 min-h-[200px]
         ${isOver ? 'bg-gray-200 shadow-inner' : 'bg-gray-100'}
       `}
     >
-      <div className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing">
+      <div
+        className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
         <div className="flex items-center gap-1.5">
           <GripVertical className="w-4 h-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>

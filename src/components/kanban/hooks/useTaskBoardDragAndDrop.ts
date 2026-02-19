@@ -20,6 +20,8 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   }, [initialData]);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
+  const isColumnDrag = activeId ? columns.some((c) => c.id === activeId) : false;
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -44,12 +46,14 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
+    if (isColumnDrag) return;
+
     const { active, over, delta } = event;
     const activeId = String(active.id);
     const overId = over ? String(over.id) : null;
     const activeColumn = findColumn(activeId);
     const overColumn = findColumn(overId);
-    
+
     if (!activeColumn || !overColumn) {
       return null;
     }
@@ -112,13 +116,27 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
     const { active, over } = event;
     const activeId = String(active.id);
     const overId = over ? String(over.id) : null;
-    const activeColumn = findColumn(activeId);
-    const overColumn = findColumn(overId);
 
     setActiveId(null);
 
+    if (!overId) return;
+
+    // Column reordering
+    if (columns.some((c) => c.id === activeId)) {
+      const activeIndex = columns.findIndex((c) => c.id === activeId);
+      const overIndex = columns.findIndex((c) => c.id === overId);
+      if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
+        setColumns((prev) => arrayMove(prev, activeIndex, overIndex));
+      }
+      return;
+    }
+
+    // Card reordering
+    const activeColumn = findColumn(activeId);
+    const overColumn = findColumn(overId);
+
     if (!activeColumn || !overColumn || activeColumn !== overColumn) {
-      return null;
+      return;
     }
     const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
     const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
@@ -141,13 +159,19 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
     return allCards.find((c) => c.id === activeId);
   };
 
+  const getActiveColumn = () => {
+    return columns.find((c) => c.id === activeId);
+  };
+
   return {
     columns,
     activeId,
+    isColumnDrag,
     sensors,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     getActiveCard,
+    getActiveColumn,
   };
 };

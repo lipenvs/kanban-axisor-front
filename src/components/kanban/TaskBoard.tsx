@@ -5,6 +5,7 @@ import {
   defaultDropAnimationSideEffects,
   type DropAnimation,
 } from "@dnd-kit/core";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Column from "./Column";
@@ -49,14 +50,17 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
 
   const {
     columns,
+    isColumnDrag,
     sensors,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     getActiveCard,
+    getActiveColumn,
   } = useTaskBoardDragAndDrop(kanbanData?.data ?? []);
 
   const activeCard = getActiveCard();
+  const activeColumn = getActiveColumn();
 
   const { mutate: createColumn } = usePostColumnsWithJson();
   const { mutate: createTask } = usePostTasksWithJson();
@@ -218,35 +222,46 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
       onDragOver={handleDragOver}
     >
       <ScrollArea className="flex-1 w-full whitespace-nowrap">
-        <div className="flex w-max space-x-3 md:space-x-4 pb-4">
-          {columns.map((column) => (
-            <Column
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              cards={column.cards}
-              onCreateTask={setCreateTaskColumnId}
-              onDeleteTask={handleDeleteTask}
-              onEditTask={handleEditTask}
-              onEditColumn={(id) => handleEditColumn(id)}
-              onDeleteColumn={handleDeleteColumn}
-            />
-          ))}
-          <button
-            onClick={() => setIsColumnDialogOpen(true)}
-            className="w-64 md:w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10
-                rounded-xl border-2 border-dashed border-border/40 hover:border-border
-                text-muted-foreground hover:text-foreground
-                bg-muted/10 hover:bg-muted/30
-                transition-all duration-200 cursor-pointer">
-            <Plus className="w-4 h-4" />
-            Criar coluna
-          </button>
-        </div>
+        <SortableContext items={columns.map((c) => c.id)} strategy={horizontalListSortingStrategy}>
+          <div className="flex w-max space-x-3 md:space-x-4 pb-4">
+            {columns.map((column) => (
+              <Column
+                key={column.id}
+                id={column.id}
+                title={column.title}
+                cards={column.cards}
+                onCreateTask={setCreateTaskColumnId}
+                onDeleteTask={handleDeleteTask}
+                onEditTask={handleEditTask}
+                onEditColumn={(id) => handleEditColumn(id)}
+                onDeleteColumn={handleDeleteColumn}
+              />
+            ))}
+            <button
+              onClick={() => setIsColumnDialogOpen(true)}
+              className="w-64 md:w-72 shrink-0 h-fit flex items-center justify-center gap-2 py-10
+                  rounded-xl border-2 border-dashed border-border/40 hover:border-border
+                  text-muted-foreground hover:text-foreground
+                  bg-muted/10 hover:bg-muted/30
+                  transition-all duration-200 cursor-pointer">
+              <Plus className="w-4 h-4" />
+              Criar coluna
+            </button>
+          </div>
+        </SortableContext>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <DragOverlay dropAnimation={dropAnimation}>
-        {activeCard ? <Card card={activeCard} /> : null}
+        {isColumnDrag && activeColumn ? (
+          <div className="w-64 md:w-72 rounded-xl p-3 bg-gray-100 opacity-80 shadow-lg min-h-[200px]">
+            <div className="flex items-center gap-1.5 mb-3">
+              <h3 className="text-sm font-semibold text-foreground">{activeColumn.title}</h3>
+            </div>
+            <div className="text-xs text-muted-foreground">{activeColumn.cards.length} tarefa(s)</div>
+          </div>
+        ) : activeCard ? (
+          <Card card={activeCard} />
+        ) : null}
       </DragOverlay>
 
       <ColumnDialog
