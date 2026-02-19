@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { PostTasksWithUrlEncoded201Assignee } from './postTasksWithUrlEncoded201Assignee'
+import type { PostTasksWithUrlEncoded201Label } from './postTasksWithUrlEncoded201Label'
 
 export type PostTasksWithUrlEncoded201 = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type PostTasksWithUrlEncoded201 = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: PostTasksWithUrlEncoded201Label
+  /** @nullable */
+  assignee?: PostTasksWithUrlEncoded201Assignee
 }

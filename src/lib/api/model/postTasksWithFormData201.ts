@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { PostTasksWithFormData201Assignee } from './postTasksWithFormData201Assignee'
+import type { PostTasksWithFormData201Label } from './postTasksWithFormData201Label'
 
 export type PostTasksWithFormData201 = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type PostTasksWithFormData201 = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: PostTasksWithFormData201Label
+  /** @nullable */
+  assignee?: PostTasksWithFormData201Assignee
 }

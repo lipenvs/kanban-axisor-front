@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { PostTasksWithJson201Assignee } from './postTasksWithJson201Assignee'
+import type { PostTasksWithJson201Label } from './postTasksWithJson201Label'
 
 export type PostTasksWithJson201 = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type PostTasksWithJson201 = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: PostTasksWithJson201Label
+  /** @nullable */
+  assignee?: PostTasksWithJson201Assignee
 }

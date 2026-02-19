@@ -15,24 +15,24 @@ import type { GetColumns200ColumnsItem as Column } from '@/lib/api/model'
 interface ColumnDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    column?: Column | null
+    initialTitle?: string
     onSubmit: (title: string) => void
 }
 
 export default function ColumnDialog({
     open,
     onOpenChange,
-    column,
+    initialTitle = '',
     onSubmit,
 }: ColumnDialogProps) {
-    const isEditing = !!column
+    const isEditing = !!initialTitle
     const [title, setTitle] = useState('')
 
     useEffect(() => {
         if (open) {
-            setTitle(column?.title ?? '')
+            setTitle(initialTitle)
         }
-    }, [open, column])
+    }, [open, initialTitle])
 
     function handleSubmit() {
         if (!title.trim()) return

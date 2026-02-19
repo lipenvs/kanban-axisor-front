@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { PutTasksByIdWithJson200Assignee } from './putTasksByIdWithJson200Assignee'
+import type { PutTasksByIdWithJson200Label } from './putTasksByIdWithJson200Label'
 
 export type PutTasksByIdWithJson200 = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type PutTasksByIdWithJson200 = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: PutTasksByIdWithJson200Label
+  /** @nullable */
+  assignee?: PutTasksByIdWithJson200Assignee
 }

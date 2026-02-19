@@ -15,12 +15,13 @@ export type PutTasksByIdWithJsonBodyOne = {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   labelId?: string | null
+  /**
+   * @nullable
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  assigneeId?: string | null
   description?: string
   /** @nullable */
   dueDate?: string | null
-  /**
-   * @minimum -9007199254740991
-   * @maximum 9007199254740991
-   */
-  order?: number
+  order?: string
 }

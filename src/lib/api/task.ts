@@ -172,6 +172,15 @@ export const postTasksWithUrlEncoded = async (
   ) {
     formUrlEncoded.append(`labelId`, postTasksWithUrlEncodedBodyTwo.labelId)
   }
+  if (
+    postTasksWithUrlEncodedBodyTwo.assigneeId !== undefined &&
+    postTasksWithUrlEncodedBodyTwo.assigneeId !== null
+  ) {
+    formUrlEncoded.append(
+      `assigneeId`,
+      postTasksWithUrlEncodedBodyTwo.assigneeId,
+    )
+  }
   if (postTasksWithUrlEncodedBodyTwo.description !== undefined) {
     formUrlEncoded.append(
       `description`,
@@ -305,6 +314,12 @@ export const postTasksWithFormData = async (
     postTasksWithFormDataBodyThree.labelId !== null
   ) {
     formData.append(`labelId`, postTasksWithFormDataBodyThree.labelId)
+  }
+  if (
+    postTasksWithFormDataBodyThree.assigneeId !== undefined &&
+    postTasksWithFormDataBodyThree.assigneeId !== null
+  ) {
+    formData.append(`assigneeId`, postTasksWithFormDataBodyThree.assigneeId)
   }
   if (postTasksWithFormDataBodyThree.description !== undefined) {
     formData.append(`description`, postTasksWithFormDataBodyThree.description)
@@ -712,6 +727,15 @@ export const putTasksByIdWithUrlEncoded = async (
   ) {
     formUrlEncoded.append(`labelId`, putTasksByIdWithUrlEncodedBodyTwo.labelId)
   }
+  if (
+    putTasksByIdWithUrlEncodedBodyTwo.assigneeId !== undefined &&
+    putTasksByIdWithUrlEncodedBodyTwo.assigneeId !== null
+  ) {
+    formUrlEncoded.append(
+      `assigneeId`,
+      putTasksByIdWithUrlEncodedBodyTwo.assigneeId,
+    )
+  }
   if (putTasksByIdWithUrlEncodedBodyTwo.description !== undefined) {
     formUrlEncoded.append(
       `description`,
@@ -725,10 +749,7 @@ export const putTasksByIdWithUrlEncoded = async (
     formUrlEncoded.append(`dueDate`, putTasksByIdWithUrlEncodedBodyTwo.dueDate)
   }
   if (putTasksByIdWithUrlEncodedBodyTwo.order !== undefined) {
-    formUrlEncoded.append(
-      `order`,
-      putTasksByIdWithUrlEncodedBodyTwo.order.toString(),
-    )
+    formUrlEncoded.append(`order`, putTasksByIdWithUrlEncodedBodyTwo.order)
   }
 
   const res = await fetch(getPutTasksByIdWithUrlEncodedUrl(id), {
@@ -859,6 +880,12 @@ export const putTasksByIdWithFormData = async (
   ) {
     formData.append(`labelId`, putTasksByIdWithFormDataBodyThree.labelId)
   }
+  if (
+    putTasksByIdWithFormDataBodyThree.assigneeId !== undefined &&
+    putTasksByIdWithFormDataBodyThree.assigneeId !== null
+  ) {
+    formData.append(`assigneeId`, putTasksByIdWithFormDataBodyThree.assigneeId)
+  }
   if (putTasksByIdWithFormDataBodyThree.description !== undefined) {
     formData.append(
       `description`,
@@ -872,7 +899,7 @@ export const putTasksByIdWithFormData = async (
     formData.append(`dueDate`, putTasksByIdWithFormDataBodyThree.dueDate)
   }
   if (putTasksByIdWithFormDataBodyThree.order !== undefined) {
-    formData.append(`order`, putTasksByIdWithFormDataBodyThree.order.toString())
+    formData.append(`order`, putTasksByIdWithFormDataBodyThree.order)
   }
 
   const res = await fetch(getPutTasksByIdWithFormDataUrl(id), {

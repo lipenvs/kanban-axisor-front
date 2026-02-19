@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown, ShieldCheck, ShieldAlert, Loader2, Download, Trash2 } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
 import type { GetTasks200TasksItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 import {
@@ -79,7 +80,7 @@ const taskFormSchema = z.object({
   description: z.string(),
   dueDate: z.string(),
   labelId: z.string(),
-  assigneeId: z.string().min(1, 'Selecione um responsável'),
+  assigneeId: z.string(),
   attachments: z.array(z.any()),
 })
 
@@ -132,7 +133,7 @@ export default function TaskDialog({
       description: task?.description ?? '',
       dueDate: task?.dueDate?.split('T')[0] ?? '',
       labelId: task?.labelId ?? '',
-      assigneeId: session?.user?.id ?? '',
+      assigneeId: task?.assigneeId ?? '',
       attachments: [] as LocalAttachment[],
     },
     validators: {
@@ -144,7 +145,7 @@ export default function TaskDialog({
         description: value.description.trim() || undefined,
         dueDate: value.dueDate || null,
         labelId: value.labelId || null,
-        assigneeId: value.assigneeId,
+        assigneeId: value.assigneeId || null,
         files: value.attachments.length > 0 ? value.attachments.map((a) => a.file) : undefined,
       })
     },
@@ -157,7 +158,7 @@ export default function TaskDialog({
         description: task?.description ?? '',
         dueDate: task?.dueDate?.split('T')[0] ?? '',
         labelId: task?.labelId ?? '',
-        assigneeId: session?.user?.id ?? '',
+        assigneeId: task?.assigneeId ?? '',
         attachments: [],
       })
     }
@@ -235,13 +236,12 @@ export default function TaskDialog({
             {(field) => (
               <Field>
                 <FieldLabel htmlFor="task-desc">Descricao</FieldLabel>
-                <textarea
+                <Textarea
                   id="task-desc"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Descreva a tarefa..."
-                  rows={3}
-                  className="border-input placeholder:text-muted-foreground dark:bg-input/30 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none"
+                  className="resize-none"
                 />
               </Field>
             )}
@@ -302,6 +302,7 @@ export default function TaskDialog({
                         role="combobox"
                         aria-expanded={openCombobox}
                         className="w-full justify-between font-normal px-3"
+                        aria-invalid={isInvalid}
                       >
                         {field.state.value && session?.user && field.state.value === session.user.id ? (
                           <div className="flex items-center gap-2">

@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { PutTasksByIdWithUrlEncoded200Assignee } from './putTasksByIdWithUrlEncoded200Assignee'
+import type { PutTasksByIdWithUrlEncoded200Label } from './putTasksByIdWithUrlEncoded200Label'
 
 export type PutTasksByIdWithUrlEncoded200 = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type PutTasksByIdWithUrlEncoded200 = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: PutTasksByIdWithUrlEncoded200Label
+  /** @nullable */
+  assignee?: PutTasksByIdWithUrlEncoded200Assignee
 }

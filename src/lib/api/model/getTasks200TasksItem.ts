@@ -5,14 +5,18 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
+import type { GetTasks200TasksItemAssignee } from './getTasks200TasksItemAssignee'
+import type { GetTasks200TasksItemLabel } from './getTasks200TasksItemLabel'
 
 export type GetTasks200TasksItem = {
   id: string
   title: string
-  order: number
+  order: string
   columnId: string
   /** @nullable */
   labelId: string | null
+  /** @nullable */
+  assigneeId: string | null
   /** @nullable */
   description?: string | null
   /** @nullable */
@@ -21,4 +25,8 @@ export type GetTasks200TasksItem = {
   createdAt?: string | null
   /** @nullable */
   updatedAt?: string | null
+  /** @nullable */
+  label?: GetTasks200TasksItemLabel
+  /** @nullable */
+  assignee?: GetTasks200TasksItemAssignee
 }
