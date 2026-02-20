@@ -11,7 +11,8 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
-import { Eye, EyeOff } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon } from '@/components/icons/google'
 import { LinkedInIcon } from '@/components/icons/linkedin'
 import { auth } from '@/lib/auth'
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/register')({
 
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const form = useForm({
@@ -37,6 +39,7 @@ function RegisterPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
+      setErrorMessage(null)
       await auth.signUp.email(
         {
           name: value.name,
@@ -50,7 +53,7 @@ function RegisterPage() {
             })
           },
           onError: (ctx) => {
-            alert(ctx.error.message || 'Erro ao criar conta')
+            setErrorMessage(ctx.error.message || 'Erro ao criar conta')
           },
         },
       )
@@ -73,6 +76,14 @@ function RegisterPage() {
               Preencha os dados abaixo para criar sua conta.
             </p>
           </div>
+
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertTitle>Erro ao criar conta</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
 
           <form
             onSubmit={(e) => {

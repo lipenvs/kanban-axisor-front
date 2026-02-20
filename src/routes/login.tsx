@@ -11,7 +11,8 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
-import { Eye, EyeOff } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon } from '@/components/icons/google'
 import { LinkedInIcon } from '@/components/icons/linkedin'
 import { auth } from '@/lib/auth'
@@ -27,6 +28,7 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const form = useForm({
@@ -35,6 +37,7 @@ function LoginPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
+      setErrorMessage(null)
       await auth.signIn.email(
         {
           email: value.email,
@@ -45,7 +48,7 @@ function LoginPage() {
             navigate({ to: '/tasks' })
           },
           onError: (ctx) => {
-            alert(ctx.error.message || 'Erro ao fazer login')
+            setErrorMessage(ctx.error.message || 'Erro ao fazer login')
           },
         },
       )
@@ -68,6 +71,14 @@ function LoginPage() {
               Bem-vindo de volta! Digite suas credenciais para continuar.
             </p>
           </div>
+
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertTitle>Erro ao entrar</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
 
           <form
             onSubmit={(e) => {
