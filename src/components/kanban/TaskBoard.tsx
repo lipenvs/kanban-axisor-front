@@ -13,7 +13,7 @@ import Card from "./Card";
 import ColumnDialog from "./ColumnDialog";
 import TaskDialog from "./TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetColumnsKanban, usePostColumnsWithJson, usePutColumnsPositionsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
@@ -36,9 +36,10 @@ const dropAnimation: DropAnimation = {
 
 interface TaskBoardProps {
   projectId: string;
+  labelId?: string;
 }
 
-export default function TaskBoard({ projectId }: TaskBoardProps) {
+export default function TaskBoard({ projectId, labelId }: TaskBoardProps) {
   const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [createTaskColumnId, setCreateTaskColumnId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -51,6 +52,15 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
   const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
   const { data: labelsData } = useGetLabelsByProjectId(projectId);
 
+  const filteredKanbanColumns = useMemo(() => {
+    const baseColumns = kanbanData?.data ?? [];
+    if (!labelId) return baseColumns;
+    return baseColumns.map((column) => ({
+      ...column,
+      cards: column.cards.filter((card) => card.labelId === labelId),
+    }));
+  }, [kanbanData?.data, labelId]);
+
   const {
     columns,
     isColumnDrag,
@@ -60,7 +70,7 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
     handleDragEnd: baseHandleDragEnd,
     getActiveCard,
     getActiveColumn,
-  } = useTaskBoardDragAndDrop(kanbanData?.data ?? []);
+  } = useTaskBoardDragAndDrop(filteredKanbanColumns);
 
   // Handler para integrar com backend ao soltar (card ou coluna)
   const handleDragEnd = (event: any) => {

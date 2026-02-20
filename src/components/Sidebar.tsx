@@ -11,8 +11,8 @@ import {
 import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
-import { useState } from 'react'
-import { useNavigate, useParams, useMatchRoute } from '@tanstack/react-router'
+import { useMemo, useState } from 'react'
+import { useNavigate, useParams, useMatchRoute, useRouterState } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
 import { useGetLabelsByProjectId, useDeleteLabelsById, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { CreateLabelDialog } from './kanban/dialogs/CreateLabelDialog'
@@ -33,6 +33,12 @@ export default function Sidebar() {
   const matchRoute = useMatchRoute()
   const isMembers = matchRoute({ to: '/members' })
   const isTasks = !isMembers
+
+  const locationSearch = useRouterState({ select: (s) => s.location.search })
+  const selectedLabelId = useMemo(() => {
+    const sp = new URLSearchParams(locationSearch)
+    return sp.get('labelId')
+  }, [locationSearch])
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [labelToDelete, setLabelToDelete] = useState<{ id: string; name: string } | null>(null)
@@ -170,22 +176,49 @@ export default function Sidebar() {
               {labels.map((cat) => (
                 <div key={cat.id} className="flex flex-col">
                   <div
-                    className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-accent transition-colors group select-none cursor-pointer"
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors group select-none cursor-pointer ${
+                      selectedLabelId === cat.id
+                        ? 'bg-accent text-accent-foreground'
+                        : 'hover:bg-accent'
+                    }`}
+                    onClick={() => {
+                      if (!selectedProjectId) return
+                      setExpandedActions(null)
+                      const nextLabelId =
+                        selectedLabelId === cat.id ? undefined : cat.id
+                      navigate({
+                        to: '/tasks/$projectId',
+                        params: { projectId: selectedProjectId },
+                        search: (prev) => ({ ...prev, labelId: nextLabelId }),
+                      })
+                      close()
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-3 h-3 rounded-sm shrink-0"
                         style={{ backgroundColor: cat.color }}
                       />
-                      <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                      <span
+                        className={`text-sm transition-colors ${
+                          selectedLabelId === cat.id
+                            ? 'text-accent-foreground'
+                            : 'text-muted-foreground group-hover:text-foreground'
+                        }`}
+                      >
                         {cat.name}
                       </span>
                     </div>
 
                     <Button
                       variant="ghost"
-                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background cursor-pointer"
-                      onClick={() => setExpandedActions(expandedActions === cat.id ? null : cat.id)}
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background cursor-default"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setExpandedActions(
+                          expandedActions === cat.id ? null : cat.id,
+                        )
+                      }}
                     >
                       <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                     </Button>

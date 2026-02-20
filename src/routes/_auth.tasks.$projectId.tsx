@@ -5,16 +5,21 @@ import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
+import { z } from 'zod'
 import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson, useDeleteProjectsById } from '@/lib/api/project'
 import TaskBoard from '@/components/kanban/TaskBoard'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
+  validateSearch: z.object({
+    labelId: z.string().optional(),
+  }),
   component: TasksPage,
 })
 
 function TasksPage() {
   const { projectId } = Route.useParams()
+  const { labelId } = Route.useSearch()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { data: projectsResponse, isFetching } = useGetProjects()
@@ -125,7 +130,7 @@ function TasksPage() {
         </Button>
       </div>
 
-      <TaskBoard projectId={projectId} />
+      <TaskBoard projectId={projectId} labelId={labelId} />
 
       <ConfirmDeleteDialog
         open={showDeleteDialog}
