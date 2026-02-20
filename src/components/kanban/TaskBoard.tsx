@@ -38,9 +38,10 @@ const dropAnimation: DropAnimation = {
 interface TaskBoardProps {
   projectId: string;
   labelId?: string;
+  searchQuery?: string;
 }
 
-export default function TaskBoard({ projectId, labelId }: TaskBoardProps) {
+export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoardProps) {
   const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [createTaskColumnId, setCreateTaskColumnId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -64,12 +65,29 @@ export default function TaskBoard({ projectId, labelId }: TaskBoardProps) {
 
   const filteredKanbanColumns = useMemo(() => {
     const baseColumns = kanbanData?.data ?? [];
-    if (!labelId) return baseColumns;
-    return baseColumns.map((column) => ({
-      ...column,
-      cards: column.cards.filter((card) => card.labelId === labelId),
-    }));
-  }, [kanbanData?.data, labelId]);
+    let filtered = baseColumns;
+
+    // Filtrar por labelId
+    if (labelId) {
+      filtered = filtered.map((column) => ({
+        ...column,
+        cards: column.cards.filter((card) => card.labelId === labelId),
+      }));
+    }
+
+    // Filtrar por searchQuery (título da tarefa)
+    if (searchQuery?.trim()) {
+      const query = searchQuery.trim().toLowerCase();
+      filtered = filtered.map((column) => ({
+        ...column,
+        cards: column.cards.filter((card) =>
+          card.title.toLowerCase().includes(query)
+        ),
+      }));
+    }
+
+    return filtered;
+  }, [kanbanData?.data, labelId, searchQuery]);
 
   const {
     columns,

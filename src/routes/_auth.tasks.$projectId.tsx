@@ -13,13 +13,14 @@ import { toast } from 'sonner'
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
   validateSearch: z.object({
     labelId: z.string().optional(),
+    search: z.string().optional(),
   }),
   component: TasksPage,
 })
 
 function TasksPage() {
   const { projectId } = Route.useParams()
-  const { labelId } = Route.useSearch()
+  const { labelId, search } = Route.useSearch()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { data: projectsResponse, isFetching } = useGetProjects()
@@ -130,7 +131,7 @@ function TasksPage() {
         </Button>
       </div>
 
-      <TaskBoard projectId={projectId} labelId={labelId} />
+      <TaskBoard projectId={projectId} labelId={labelId} searchQuery={search} />
 
       <ConfirmDeleteDialog
         open={showDeleteDialog}
