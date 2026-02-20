@@ -12,9 +12,8 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import type { ColumnType } from "../Column";
 
-// TODO: Hooks hipotéticos do react-query — substitua pela sua implementação real
-// import { useColumnsReorder } from "./useColumnsReorder";
-// import { useTasksReorder } from "./useTasksReorder";
+import { usePatchColumnsReorderWithJson } from "@/lib/api/column";
+import { usePatchTasksReorderWithJson } from "@/lib/api/task";
 
 export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   const [columns, setColumns] = useState<ColumnType[]>(initialData);
@@ -35,14 +34,17 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
   const isColumnDrag = activeId ? columns.some((c) => c.id === activeId) : false;
 
-  // TODO: Implementar hooks do react-query
-  // const { mutate: reorderColumns } = useColumnsReorder({
-  //   onError: () => setColumns(snapshotRef.current),
-  // });
+  const { mutate: reorderColumns } = usePatchColumnsReorderWithJson({
+    mutation: {
+      onError: () => setColumns(snapshotRef.current),
+    },
+  });
 
-  // const { mutate: reorderTasks } = useTasksReorder({
-  //   onError: () => setColumns(snapshotRef.current),
-  // });
+  const { mutate: reorderTasks } = usePatchTasksReorderWithJson({
+    mutation: {
+      onError: () => setColumns(snapshotRef.current),
+    },
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -160,13 +162,14 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
         setColumns(nextColumns);
       }
 
-      // TODO: PATCH /columns/reorder
-      // reorderColumns(
-      //   nextColumns.map((col, index) => ({
-      //     id: col.id,
-      //     order: index + 1,
-      //   }))
-      // );
+      reorderColumns({
+        data: {
+          columns: nextColumns.map((col, index) => ({
+            id: col.id,
+            order: index + 1,
+          })),
+        },
+      });
 
       return;
     }
@@ -202,8 +205,11 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
         })),
       ];
 
-      // TODO: PATCH /tasks/reorder — envia tasks das duas colunas afetadas
-      // reorderTasks(tasksToReorder);
+      reorderTasks({
+        data: {
+          tasks: tasksToReorder,
+        },
+      });
     } else {
       // Card ficou na mesma coluna, reordena só ela
       const activeIndex = currentColumn.cards.findIndex((i) => i.id === activeId);
@@ -222,16 +228,17 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
         setColumns(nextColumns);
       }
 
-      // const updatedColumn = nextColumns.find((c) => c.id === currentColumn.id)!;
+      const updatedColumn = nextColumns.find((c) => c.id === currentColumn.id)!;
 
-      // TODO: PATCH /tasks/reorder — envia só a coluna afetada
-      // reorderTasks(
-      //   updatedColumn.cards.map((card, index) => ({
-      //     id: card.id,
-      //     columnId: updatedColumn.id,
-      //     order: index + 1,
-      //   }))
-      // );
+      reorderTasks({
+        data: {
+          tasks: updatedColumn.cards.map((card, index) => ({
+            id: card.id,
+            columnId: updatedColumn.id,
+            order: index + 1,
+          })),
+        },
+      });
     }
   };
 
