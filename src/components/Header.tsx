@@ -1,7 +1,7 @@
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useMatchRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from '../lib/auth'
-import { Bell, Search, LogOut, Settings, Plus, Menu } from 'lucide-react'
+import { Search, LogOut, Settings, Plus, Menu } from 'lucide-react'
 import { NotificationPopover } from './NotificationPopover'
 import { useState } from 'react'
 import { Input } from './ui/input'
@@ -22,6 +22,8 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddProject, setShowAddProject] = useState(false)
   const { toggle } = useSidebar()
+  const matchRoute = useMatchRoute()
+  const isTasksPage = matchRoute({ to: '/tasks' }) || matchRoute({ to: '/tasks/$projectId' })
 
   const { data } = useQuery({
     queryKey: ['session'],
@@ -48,18 +50,22 @@ export default function Header() {
         <Menu className="w-5 h-5" />
       </Button>
 
-      <div className="flex items-center gap-3 flex-1 max-w-md">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            placeholder="Buscar tarefas..."
-            className="pl-9 h-9 bg-muted/50 border-border/50"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {isTasksPage ? (
+        <div className="flex items-center gap-3 flex-1 max-w-md">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              placeholder="Buscar tarefas..."
+              className="pl-9 h-9 bg-muted/50 border-border/50"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex-1 max-w-md" />
+      )}
 
       <div className="flex items-center gap-2 md:gap-4">
         <Button size="sm" onClick={() => setShowAddProject(true)} className="hidden sm:inline-flex">

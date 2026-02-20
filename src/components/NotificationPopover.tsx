@@ -20,7 +20,7 @@ export function NotificationPopover() {
                     <Bell size={20} />
                     {hasUnread && (
                         <span
-                            className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 border-2 border-background shadow"
+                            className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-indigo-500 border-2 border-background shadow"
                             aria-label="Notificações não lidas"
                         />
                     )}
