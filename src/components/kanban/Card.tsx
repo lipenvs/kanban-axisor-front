@@ -4,9 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, Trash2, User, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import type { GetColumnsKanban200ItemCardsItem } from "../../lib/api/model/getColumnsKanban200ItemCardsItem";
+import type { GetColumnsWithTasks200ItemCardsItem } from "../../lib/api/model/getColumnsWithTasks200ItemCardsItem";
 
-export type CardType = GetColumnsKanban200ItemCardsItem;
+export type CardType = GetColumnsWithTasks200ItemCardsItem;
 
 interface CardProps {
   card: CardType;
@@ -57,30 +57,33 @@ const Card = ({ card, onDelete, onClick }: CardProps) => {
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          {card.label && (
-            <div
-              className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border"
-              style={{ borderColor: card.label.color, color: card.label.color }}
-            >
+      {card.label && (
+        <div className="mt-2">
+          <div
+            className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border max-w-full"
+            style={{ borderColor: card.label.color, color: card.label.color }}
+            title={card.label.name}
+          >
+            <span className="truncate">
               {card.label.name}
-            </div>
-          )}
+            </span>
+          </div>
+        </div>
+      )}
 
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
           {card.dueDate && (
-            <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
+            <span className="flex items-center gap-1 text-[12px]">
               <Calendar className="w-3 h-3" />
               {new Date(card.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
             </span>
           )}
 
-          {(card as any).attachmentCount > 0 && (
-            <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
-              <Paperclip className="w-3 h-3" />
-              {(card as any).attachmentCount}
-            </span>
-          )}
+          <span className="flex items-center gap-1 text-[12px]">
+            <Paperclip className="w-3 h-3" />
+            {card.attachmentCount}
+          </span>
         </div>
 
         <Avatar className="h-6 w-6">
