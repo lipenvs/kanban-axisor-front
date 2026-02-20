@@ -12,13 +12,20 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEffect, useRef, useState } from "react";
 import type { ColumnType } from "../Column";
 
-// TODO: Hook hipotético do react-query — substitua pela sua implementação real
-// import { useBoardReorder } from "./useBoardReorder";
+// TODO: Hooks hipotéticos do react-query — substitua pela sua implementação real
+// import { useColumnsReorder } from "./useColumnsReorder";
+// import { useTasksReorder } from "./useTasksReorder";
 
 export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   const [columns, setColumns] = useState<ColumnType[]>(initialData);
 
+  // Snapshot para rollback em caso de erro no backend
   const snapshotRef = useRef<ColumnType[]>(initialData);
+
+  // Coluna de origem do card no momento em que o drag começou
+  // Necessário para detectar mudança de coluna no handleDragEnd,
+  // já que o handleDragOver já moveu o card visualmente antes do drop
+  const originColumnIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     setColumns(initialData);
@@ -28,12 +35,13 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
   const isColumnDrag = activeId ? columns.some((c) => c.id === activeId) : false;
 
-  // TODO: Hook hipotético do react-query
-  // const { mutate: reorderBoard } = useBoardReorder({
-  //   onError: () => {
-  //     // Rollback para o estado anterior ao drag em caso de falha
-  //     setColumns(snapshotRef.current);
-  //   },
+  // TODO: Implementar hooks do react-query
+  // const { mutate: reorderColumns } = useColumnsReorder({
+  //   onError: () => setColumns(snapshotRef.current),
+  // });
+
+  // const { mutate: reorderTasks } = useTasksReorder({
+  //   onError: () => setColumns(snapshotRef.current),
   // });
 
   const sensors = useSensors(
@@ -58,6 +66,10 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id);
     snapshotRef.current = columns;
+
+    // Guarda a coluna de origem antes de qualquer movimento
+    const originColumn = findColumn(active.id);
+    originColumnIdRef.current = originColumn?.id ?? null;
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -138,6 +150,7 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
     let nextColumns = columns;
 
+    // Reordenação de colunas
     if (columns.some((c) => c.id === activeId)) {
       const activeIndex = columns.findIndex((c) => c.id === activeId);
       const overIndex = columns.findIndex((c) => c.id === overId);
@@ -146,37 +159,80 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
         nextColumns = arrayMove(columns, activeIndex, overIndex);
         setColumns(nextColumns);
       }
+
+      // TODO: PATCH /columns/reorder
+      // reorderColumns(
+      //   nextColumns.map((col, index) => ({
+      //     id: col.id,
+      //     order: index + 1,
+      //   }))
+      // );
+
+      return;
+    }
+
+    // Reordenação de tasks
+    // Neste ponto o handleDragOver já moveu o card para a coluna de destino,
+    // então findColumn(activeId) retorna a coluna atual (destino), não a origem.
+    const currentColumn = findColumn(activeId);
+    const originColumnId = originColumnIdRef.current;
+    const movedBetweenColumns = originColumnId !== null && originColumnId !== currentColumn?.id;
+
+    if (!currentColumn) return;
+
+    if (movedBetweenColumns) {
+      // Card mudou de coluna: precisa persistir as duas colunas afetadas
+      // - coluna de destino: cards reordenados com o novo card incluso
+      // - coluna de origem: cards reordenados após a remoção do card
+      const originColumn = nextColumns.find((c) => c.id === originColumnId);
+      const destinationColumn = nextColumns.find((c) => c.id === currentColumn.id);
+
+      if (!originColumn || !destinationColumn) return;
+
+      const tasksToReorder = [
+        ...destinationColumn.cards.map((card, index) => ({
+          id: card.id,
+          columnId: destinationColumn.id,
+          order: index + 1,
+        })),
+        ...originColumn.cards.map((card, index) => ({
+          id: card.id,
+          columnId: originColumn.id,
+          order: index + 1,
+        })),
+      ];
+
+      // TODO: PATCH /tasks/reorder — envia tasks das duas colunas afetadas
+      // reorderTasks(tasksToReorder);
     } else {
-      const activeColumn = findColumn(activeId);
-      const overColumn = findColumn(overId);
-
-      if (!activeColumn || !overColumn || activeColumn !== overColumn) return;
-
-      const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
-      const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
+      // Card ficou na mesma coluna, reordena só ela
+      const activeIndex = currentColumn.cards.findIndex((i) => i.id === activeId);
+      const overIndex = currentColumn.cards.findIndex((i) => i.id === overId);
 
       if (activeIndex !== overIndex) {
         nextColumns = columns.map((column) => {
-          if (column.id === activeColumn.id) {
+          if (column.id === currentColumn.id) {
             return {
               ...column,
-              cards: arrayMove(overColumn.cards, activeIndex, overIndex),
+              cards: arrayMove(currentColumn.cards, activeIndex, overIndex),
             };
           }
           return column;
         });
         setColumns(nextColumns);
       }
-    }
 
-    // TODO:Persiste no backend apenas no dragEnd — dispara uma única vez
-    // com o estado final após o usuário soltar o card/coluna.
-    // reorderBoard({
-    //   columns: nextColumns.map((col) => ({
-    //     id: col.id,
-    //     cardIds: col.cards.map((card) => card.id),
-    //   })),
-    // });
+      // const updatedColumn = nextColumns.find((c) => c.id === currentColumn.id)!;
+
+      // TODO: PATCH /tasks/reorder — envia só a coluna afetada
+      // reorderTasks(
+      //   updatedColumn.cards.map((card, index) => ({
+      //     id: card.id,
+      //     columnId: updatedColumn.id,
+      //     order: index + 1,
+      //   }))
+      // );
+    }
   };
 
   const getActiveCard = () => {

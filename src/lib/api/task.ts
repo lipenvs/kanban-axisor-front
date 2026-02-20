@@ -25,6 +25,9 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   GetTasks200,
   GetTasksParams,
+  PatchTasksReorderWithFormDataBodyThree,
+  PatchTasksReorderWithJsonBodyOne,
+  PatchTasksReorderWithUrlEncodedBodyTwo,
   PostTasksWithFormData201,
   PostTasksWithFormDataBodyThree,
   PostTasksWithJson201,
@@ -1088,4 +1091,349 @@ export const useDeleteTasksById = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getDeleteTasksByIdMutationOptions(options), queryClient)
+}
+export type patchTasksReorderWithJsonResponse200 = {
+  data: void
+  status: 200
+}
+
+export type patchTasksReorderWithJsonResponseSuccess =
+  patchTasksReorderWithJsonResponse200 & {
+    headers: Headers
+  }
+
+export type patchTasksReorderWithJsonResponse =
+  patchTasksReorderWithJsonResponseSuccess
+
+export const getPatchTasksReorderWithJsonUrl = () => {
+  return `http://localhost:3333/tasks/reorder`
+}
+
+export const patchTasksReorderWithJson = async (
+  patchTasksReorderWithJsonBodyOne: PatchTasksReorderWithJsonBodyOne,
+  options?: RequestInit,
+): Promise<patchTasksReorderWithJsonResponse> => {
+  const res = await fetch(getPatchTasksReorderWithJsonUrl(), {
+    credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(patchTasksReorderWithJsonBodyOne),
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: patchTasksReorderWithJsonResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchTasksReorderWithJsonResponse
+}
+
+export const getPatchTasksReorderWithJsonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchTasksReorderWithJson>>,
+    TError,
+    { data: PatchTasksReorderWithJsonBodyOne },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchTasksReorderWithJson>>,
+  TError,
+  { data: PatchTasksReorderWithJsonBodyOne },
+  TContext
+> => {
+  const mutationKey = ['patchTasksReorderWithJson']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchTasksReorderWithJson>>,
+    { data: PatchTasksReorderWithJsonBodyOne }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return patchTasksReorderWithJson(data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PatchTasksReorderWithJsonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchTasksReorderWithJson>>
+>
+export type PatchTasksReorderWithJsonMutationBody =
+  PatchTasksReorderWithJsonBodyOne
+export type PatchTasksReorderWithJsonMutationError = unknown
+
+export const usePatchTasksReorderWithJson = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchTasksReorderWithJson>>,
+      TError,
+      { data: PatchTasksReorderWithJsonBodyOne },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchTasksReorderWithJson>>,
+  TError,
+  { data: PatchTasksReorderWithJsonBodyOne },
+  TContext
+> => {
+  return useMutation(
+    getPatchTasksReorderWithJsonMutationOptions(options),
+    queryClient,
+  )
+}
+export type patchTasksReorderWithUrlEncodedResponse200 = {
+  data: void
+  status: 200
+}
+
+export type patchTasksReorderWithUrlEncodedResponseSuccess =
+  patchTasksReorderWithUrlEncodedResponse200 & {
+    headers: Headers
+  }
+
+export type patchTasksReorderWithUrlEncodedResponse =
+  patchTasksReorderWithUrlEncodedResponseSuccess
+
+export const getPatchTasksReorderWithUrlEncodedUrl = () => {
+  return `http://localhost:3333/tasks/reorder`
+}
+
+export const patchTasksReorderWithUrlEncoded = async (
+  patchTasksReorderWithUrlEncodedBodyTwo: PatchTasksReorderWithUrlEncodedBodyTwo,
+  options?: RequestInit,
+): Promise<patchTasksReorderWithUrlEncodedResponse> => {
+  const formUrlEncoded = new URLSearchParams()
+  patchTasksReorderWithUrlEncodedBodyTwo.tasks.forEach((value) =>
+    formUrlEncoded.append(`tasks`, JSON.stringify(value)),
+  )
+
+  const res = await fetch(getPatchTasksReorderWithUrlEncodedUrl(), {
+    credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...options?.headers,
+    },
+    body: formUrlEncoded,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: patchTasksReorderWithUrlEncodedResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchTasksReorderWithUrlEncodedResponse
+}
+
+export const getPatchTasksReorderWithUrlEncodedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>,
+    TError,
+    { data: PatchTasksReorderWithUrlEncodedBodyTwo },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>,
+  TError,
+  { data: PatchTasksReorderWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  const mutationKey = ['patchTasksReorderWithUrlEncoded']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>,
+    { data: PatchTasksReorderWithUrlEncodedBodyTwo }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return patchTasksReorderWithUrlEncoded(data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PatchTasksReorderWithUrlEncodedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>
+>
+export type PatchTasksReorderWithUrlEncodedMutationBody =
+  PatchTasksReorderWithUrlEncodedBodyTwo
+export type PatchTasksReorderWithUrlEncodedMutationError = unknown
+
+export const usePatchTasksReorderWithUrlEncoded = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>,
+      TError,
+      { data: PatchTasksReorderWithUrlEncodedBodyTwo },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchTasksReorderWithUrlEncoded>>,
+  TError,
+  { data: PatchTasksReorderWithUrlEncodedBodyTwo },
+  TContext
+> => {
+  return useMutation(
+    getPatchTasksReorderWithUrlEncodedMutationOptions(options),
+    queryClient,
+  )
+}
+export type patchTasksReorderWithFormDataResponse200 = {
+  data: void
+  status: 200
+}
+
+export type patchTasksReorderWithFormDataResponseSuccess =
+  patchTasksReorderWithFormDataResponse200 & {
+    headers: Headers
+  }
+
+export type patchTasksReorderWithFormDataResponse =
+  patchTasksReorderWithFormDataResponseSuccess
+
+export const getPatchTasksReorderWithFormDataUrl = () => {
+  return `http://localhost:3333/tasks/reorder`
+}
+
+export const patchTasksReorderWithFormData = async (
+  patchTasksReorderWithFormDataBodyThree: PatchTasksReorderWithFormDataBodyThree,
+  options?: RequestInit,
+): Promise<patchTasksReorderWithFormDataResponse> => {
+  const formData = new FormData()
+  patchTasksReorderWithFormDataBodyThree.tasks.forEach((value) =>
+    formData.append(`tasks`, JSON.stringify(value)),
+  )
+
+  const res = await fetch(getPatchTasksReorderWithFormDataUrl(), {
+    credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    body: formData,
+  })
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
+  const data: patchTasksReorderWithFormDataResponse['data'] = body
+    ? JSON.parse(body)
+    : {}
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchTasksReorderWithFormDataResponse
+}
+
+export const getPatchTasksReorderWithFormDataMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchTasksReorderWithFormData>>,
+    TError,
+    { data: PatchTasksReorderWithFormDataBodyThree },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchTasksReorderWithFormData>>,
+  TError,
+  { data: PatchTasksReorderWithFormDataBodyThree },
+  TContext
+> => {
+  const mutationKey = ['patchTasksReorderWithFormData']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchTasksReorderWithFormData>>,
+    { data: PatchTasksReorderWithFormDataBodyThree }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return patchTasksReorderWithFormData(data, fetchOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PatchTasksReorderWithFormDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchTasksReorderWithFormData>>
+>
+export type PatchTasksReorderWithFormDataMutationBody =
+  PatchTasksReorderWithFormDataBodyThree
+export type PatchTasksReorderWithFormDataMutationError = unknown
+
+export const usePatchTasksReorderWithFormData = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchTasksReorderWithFormData>>,
+      TError,
+      { data: PatchTasksReorderWithFormDataBodyThree },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchTasksReorderWithFormData>>,
+  TError,
+  { data: PatchTasksReorderWithFormDataBodyThree },
+  TContext
+> => {
+  return useMutation(
+    getPatchTasksReorderWithFormDataMutationOptions(options),
+    queryClient,
+  )
 }
