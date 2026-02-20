@@ -9,6 +9,6 @@
 export type GetColumns200ColumnsItem = {
   id: string
   title: string
-  order: number
+  order: string
   projectId: string
 }

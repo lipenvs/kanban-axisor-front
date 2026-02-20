@@ -9,6 +9,6 @@
 export type PutColumnsByIdWithFormData200 = {
   id: string
   title: string
-  order: number
+  order: string
   projectId: string
 }

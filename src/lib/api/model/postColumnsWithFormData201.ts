@@ -9,6 +9,6 @@
 export type PostColumnsWithFormData201 = {
   id: string
   title: string
-  order: number
+  order: string
   projectId: string
 }

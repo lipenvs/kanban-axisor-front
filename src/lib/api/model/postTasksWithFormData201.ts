@@ -5,28 +5,30 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
-import type { PostTasksWithFormData201Assignee } from './postTasksWithFormData201Assignee'
-import type { PostTasksWithFormData201Label } from './postTasksWithFormData201Label'
 
 export type PostTasksWithFormData201 = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string
   title: string
   order: string
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   columnId: string
-  /** @nullable */
+  /**
+   * @nullable
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
   labelId: string | null
-  /** @nullable */
+  /**
+   * @nullable
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
   assigneeId: string | null
   /** @nullable */
-  description?: string | null
+  description: string | null
   /** @nullable */
-  dueDate?: string | null
+  dueDate: string | null
   /** @nullable */
-  createdAt?: string | null
+  createdAt: string | null
   /** @nullable */
-  updatedAt?: string | null
-  /** @nullable */
-  label?: PostTasksWithFormData201Label
-  /** @nullable */
-  assignee?: PostTasksWithFormData201Assignee
+  updatedAt: string | null
 }

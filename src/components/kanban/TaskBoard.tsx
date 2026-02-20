@@ -15,11 +15,13 @@ import TaskDialog from "./TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
+import { useGetColumnsKanban, usePostColumnsWithJson, usePutColumnsPositionsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
 import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
+import { usePostTasksReorderWithJson } from "../../lib/api/task";
+import { arrayMove } from "@dnd-kit/sortable";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -54,10 +56,49 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
     sensors,
     handleDragStart,
     handleDragOver,
-    handleDragEnd,
+    handleDragEnd: baseHandleDragEnd,
     getActiveCard,
     getActiveColumn,
   } = useTaskBoardDragAndDrop(kanbanData?.data ?? []);
+
+  // Handler para integrar com backend ao soltar (card ou coluna)
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    const activeId = String(active.id);
+    const overId = over ? String(over.id) : null;
+    const isColumnReorder =
+      overId &&
+      columns.some((c) => c.id === activeId) &&
+      columns.some((c) => c.id === overId) &&
+      activeId !== overId;
+
+    baseHandleDragEnd(event);
+    if (!over) return;
+
+    if (isColumnReorder) {
+      const activeIndex = columns.findIndex((c) => c.id === activeId);
+      const overIndex = columns.findIndex((c) => c.id === overId);
+      const newOrderIds =
+        activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex
+          ? arrayMove(columns.map((c) => c.id), activeIndex, overIndex)
+          : columns.map((c) => c.id);
+      saveColumnPositions({ data: { projectId, columnIds: newOrderIds } });
+    } else {
+      // Reordenação de card: over pode ser um card (task) ou a própria coluna (área vazia)
+      const overColumn =
+        columns.find((c) => c.cards.some((card) => card.id === overId)) ??
+        columns.find((c) => c.id === overId);
+      const targetColumnId = overColumn?.id;
+      const isOverTask = overColumn?.cards.some((card) => card.id === overId) ?? false;
+      reorderTasks({
+        data: {
+          activeId,
+          overId: isOverTask && overId ? overId : undefined,
+          columnId: targetColumnId ?? undefined,
+        },
+      });
+    }
+  };
 
   const activeCard = getActiveCard();
   const activeColumn = getActiveColumn();
@@ -66,6 +107,21 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
   const { mutate: createTask } = usePostTasksWithJson();
   const { mutate: deleteTask } = useDeleteTasksById();
   const { mutate: updateTask } = usePutTasksByIdWithJson();
+  const { mutate: reorderTasks } = usePostTasksReorderWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+        queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
+      },
+    },
+  });
+  const { mutate: saveColumnPositions } = usePutColumnsPositionsWithJson({
+    mutation: {
+      onSuccess: () => {
+        queryClient.refetchQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+      },
+    },
+  });
 
   const handleCreateColumn = (title: string) => {
     createColumn(

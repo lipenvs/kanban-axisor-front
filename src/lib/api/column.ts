@@ -27,9 +27,6 @@ import type {
   GetColumnsKanban200Item,
   GetColumnsKanbanParams,
   GetColumnsParams,
-  PostColumnsReorderWithFormDataBodyThree,
-  PostColumnsReorderWithJsonBodyOne,
-  PostColumnsReorderWithUrlEncodedBodyTwo,
   PostColumnsWithFormData201,
   PostColumnsWithFormDataBodyThree,
   PostColumnsWithJson201,
@@ -42,6 +39,9 @@ import type {
   PutColumnsByIdWithJsonBodyOne,
   PutColumnsByIdWithUrlEncoded200,
   PutColumnsByIdWithUrlEncodedBodyTwo,
+  PutColumnsPositionsWithFormDataBodyThree,
+  PutColumnsPositionsWithJsonBodyOne,
+  PutColumnsPositionsWithUrlEncodedBodyTwo,
 } from './model'
 
 export type getColumnsKanbanResponse200 = {
@@ -748,65 +748,65 @@ export function useGetColumns<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
-export type postColumnsReorderWithJsonResponse200 = {
+export type putColumnsPositionsWithJsonResponse200 = {
   data: void
   status: 200
 }
 
-export type postColumnsReorderWithJsonResponseSuccess =
-  postColumnsReorderWithJsonResponse200 & {
+export type putColumnsPositionsWithJsonResponseSuccess =
+  putColumnsPositionsWithJsonResponse200 & {
     headers: Headers
   }
 
-export type postColumnsReorderWithJsonResponse =
-  postColumnsReorderWithJsonResponseSuccess
+export type putColumnsPositionsWithJsonResponse =
+  putColumnsPositionsWithJsonResponseSuccess
 
-export const getPostColumnsReorderWithJsonUrl = () => {
-  return `http://localhost:3333/columns/reorder`
+export const getPutColumnsPositionsWithJsonUrl = () => {
+  return `http://localhost:3333/columns/positions`
 }
 
-export const postColumnsReorderWithJson = async (
-  postColumnsReorderWithJsonBodyOne: PostColumnsReorderWithJsonBodyOne,
+export const putColumnsPositionsWithJson = async (
+  putColumnsPositionsWithJsonBodyOne: PutColumnsPositionsWithJsonBodyOne,
   options?: RequestInit,
-): Promise<postColumnsReorderWithJsonResponse> => {
-  const res = await fetch(getPostColumnsReorderWithJsonUrl(), {
+): Promise<putColumnsPositionsWithJsonResponse> => {
+  const res = await fetch(getPutColumnsPositionsWithJsonUrl(), {
     credentials: 'include',
     ...options,
-    method: 'POST',
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(postColumnsReorderWithJsonBodyOne),
+    body: JSON.stringify(putColumnsPositionsWithJsonBodyOne),
   })
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: postColumnsReorderWithJsonResponse['data'] = body
+  const data: putColumnsPositionsWithJsonResponse['data'] = body
     ? JSON.parse(body)
     : {}
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as postColumnsReorderWithJsonResponse
+  } as putColumnsPositionsWithJsonResponse
 }
 
-export const getPostColumnsReorderWithJsonMutationOptions = <
+export const getPutColumnsPositionsWithJsonMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postColumnsReorderWithJson>>,
+    Awaited<ReturnType<typeof putColumnsPositionsWithJson>>,
     TError,
-    { data: PostColumnsReorderWithJsonBodyOne },
+    { data: PutColumnsPositionsWithJsonBodyOne },
     TContext
   >
   fetch?: RequestInit
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postColumnsReorderWithJson>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithJson>>,
   TError,
-  { data: PostColumnsReorderWithJsonBodyOne },
+  { data: PutColumnsPositionsWithJsonBodyOne },
   TContext
 > => {
-  const mutationKey = ['postColumnsReorderWithJson']
+  const mutationKey = ['putColumnsPositionsWithJson']
   const { mutation: mutationOptions, fetch: fetchOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -816,84 +816,83 @@ export const getPostColumnsReorderWithJsonMutationOptions = <
     : { mutation: { mutationKey }, fetch: undefined }
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postColumnsReorderWithJson>>,
-    { data: PostColumnsReorderWithJsonBodyOne }
+    Awaited<ReturnType<typeof putColumnsPositionsWithJson>>,
+    { data: PutColumnsPositionsWithJsonBodyOne }
   > = (props) => {
     const { data } = props ?? {}
 
-    return postColumnsReorderWithJson(data, fetchOptions)
+    return putColumnsPositionsWithJson(data, fetchOptions)
   }
 
   return { mutationFn, ...mutationOptions }
 }
 
-export type PostColumnsReorderWithJsonMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postColumnsReorderWithJson>>
+export type PutColumnsPositionsWithJsonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putColumnsPositionsWithJson>>
 >
-export type PostColumnsReorderWithJsonMutationBody =
-  PostColumnsReorderWithJsonBodyOne
-export type PostColumnsReorderWithJsonMutationError = unknown
+export type PutColumnsPositionsWithJsonMutationBody =
+  PutColumnsPositionsWithJsonBodyOne
+export type PutColumnsPositionsWithJsonMutationError = unknown
 
-export const usePostColumnsReorderWithJson = <
+export const usePutColumnsPositionsWithJson = <
   TError = unknown,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postColumnsReorderWithJson>>,
+      Awaited<ReturnType<typeof putColumnsPositionsWithJson>>,
       TError,
-      { data: PostColumnsReorderWithJsonBodyOne },
+      { data: PutColumnsPositionsWithJsonBodyOne },
       TContext
     >
     fetch?: RequestInit
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postColumnsReorderWithJson>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithJson>>,
   TError,
-  { data: PostColumnsReorderWithJsonBodyOne },
+  { data: PutColumnsPositionsWithJsonBodyOne },
   TContext
 > => {
   return useMutation(
-    getPostColumnsReorderWithJsonMutationOptions(options),
+    getPutColumnsPositionsWithJsonMutationOptions(options),
     queryClient,
   )
 }
-export type postColumnsReorderWithUrlEncodedResponse200 = {
+export type putColumnsPositionsWithUrlEncodedResponse200 = {
   data: void
   status: 200
 }
 
-export type postColumnsReorderWithUrlEncodedResponseSuccess =
-  postColumnsReorderWithUrlEncodedResponse200 & {
+export type putColumnsPositionsWithUrlEncodedResponseSuccess =
+  putColumnsPositionsWithUrlEncodedResponse200 & {
     headers: Headers
   }
 
-export type postColumnsReorderWithUrlEncodedResponse =
-  postColumnsReorderWithUrlEncodedResponseSuccess
+export type putColumnsPositionsWithUrlEncodedResponse =
+  putColumnsPositionsWithUrlEncodedResponseSuccess
 
-export const getPostColumnsReorderWithUrlEncodedUrl = () => {
-  return `http://localhost:3333/columns/reorder`
+export const getPutColumnsPositionsWithUrlEncodedUrl = () => {
+  return `http://localhost:3333/columns/positions`
 }
 
-export const postColumnsReorderWithUrlEncoded = async (
-  postColumnsReorderWithUrlEncodedBodyTwo: PostColumnsReorderWithUrlEncodedBodyTwo,
+export const putColumnsPositionsWithUrlEncoded = async (
+  putColumnsPositionsWithUrlEncodedBodyTwo: PutColumnsPositionsWithUrlEncodedBodyTwo,
   options?: RequestInit,
-): Promise<postColumnsReorderWithUrlEncodedResponse> => {
+): Promise<putColumnsPositionsWithUrlEncodedResponse> => {
   const formUrlEncoded = new URLSearchParams()
   formUrlEncoded.append(
-    `activeId`,
-    postColumnsReorderWithUrlEncodedBodyTwo.activeId,
+    `projectId`,
+    putColumnsPositionsWithUrlEncodedBodyTwo.projectId,
   )
-  formUrlEncoded.append(
-    `overId`,
-    postColumnsReorderWithUrlEncodedBodyTwo.overId,
+  putColumnsPositionsWithUrlEncodedBodyTwo.columnIds.forEach((value) =>
+    formUrlEncoded.append(`columnIds`, value),
   )
 
-  const res = await fetch(getPostColumnsReorderWithUrlEncodedUrl(), {
+  const res = await fetch(getPutColumnsPositionsWithUrlEncodedUrl(), {
     credentials: 'include',
     ...options,
-    method: 'POST',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       ...options?.headers,
@@ -903,34 +902,34 @@ export const postColumnsReorderWithUrlEncoded = async (
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: postColumnsReorderWithUrlEncodedResponse['data'] = body
+  const data: putColumnsPositionsWithUrlEncodedResponse['data'] = body
     ? JSON.parse(body)
     : {}
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as postColumnsReorderWithUrlEncodedResponse
+  } as putColumnsPositionsWithUrlEncodedResponse
 }
 
-export const getPostColumnsReorderWithUrlEncodedMutationOptions = <
+export const getPutColumnsPositionsWithUrlEncodedMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>,
+    Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>,
     TError,
-    { data: PostColumnsReorderWithUrlEncodedBodyTwo },
+    { data: PutColumnsPositionsWithUrlEncodedBodyTwo },
     TContext
   >
   fetch?: RequestInit
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>,
   TError,
-  { data: PostColumnsReorderWithUrlEncodedBodyTwo },
+  { data: PutColumnsPositionsWithUrlEncodedBodyTwo },
   TContext
 > => {
-  const mutationKey = ['postColumnsReorderWithUrlEncoded']
+  const mutationKey = ['putColumnsPositionsWithUrlEncoded']
   const { mutation: mutationOptions, fetch: fetchOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -940,111 +939,116 @@ export const getPostColumnsReorderWithUrlEncodedMutationOptions = <
     : { mutation: { mutationKey }, fetch: undefined }
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>,
-    { data: PostColumnsReorderWithUrlEncodedBodyTwo }
+    Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>,
+    { data: PutColumnsPositionsWithUrlEncodedBodyTwo }
   > = (props) => {
     const { data } = props ?? {}
 
-    return postColumnsReorderWithUrlEncoded(data, fetchOptions)
+    return putColumnsPositionsWithUrlEncoded(data, fetchOptions)
   }
 
   return { mutationFn, ...mutationOptions }
 }
 
-export type PostColumnsReorderWithUrlEncodedMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>
+export type PutColumnsPositionsWithUrlEncodedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>
 >
-export type PostColumnsReorderWithUrlEncodedMutationBody =
-  PostColumnsReorderWithUrlEncodedBodyTwo
-export type PostColumnsReorderWithUrlEncodedMutationError = unknown
+export type PutColumnsPositionsWithUrlEncodedMutationBody =
+  PutColumnsPositionsWithUrlEncodedBodyTwo
+export type PutColumnsPositionsWithUrlEncodedMutationError = unknown
 
-export const usePostColumnsReorderWithUrlEncoded = <
+export const usePutColumnsPositionsWithUrlEncoded = <
   TError = unknown,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>,
+      Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>,
       TError,
-      { data: PostColumnsReorderWithUrlEncodedBodyTwo },
+      { data: PutColumnsPositionsWithUrlEncodedBodyTwo },
       TContext
     >
     fetch?: RequestInit
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postColumnsReorderWithUrlEncoded>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithUrlEncoded>>,
   TError,
-  { data: PostColumnsReorderWithUrlEncodedBodyTwo },
+  { data: PutColumnsPositionsWithUrlEncodedBodyTwo },
   TContext
 > => {
   return useMutation(
-    getPostColumnsReorderWithUrlEncodedMutationOptions(options),
+    getPutColumnsPositionsWithUrlEncodedMutationOptions(options),
     queryClient,
   )
 }
-export type postColumnsReorderWithFormDataResponse200 = {
+export type putColumnsPositionsWithFormDataResponse200 = {
   data: void
   status: 200
 }
 
-export type postColumnsReorderWithFormDataResponseSuccess =
-  postColumnsReorderWithFormDataResponse200 & {
+export type putColumnsPositionsWithFormDataResponseSuccess =
+  putColumnsPositionsWithFormDataResponse200 & {
     headers: Headers
   }
 
-export type postColumnsReorderWithFormDataResponse =
-  postColumnsReorderWithFormDataResponseSuccess
+export type putColumnsPositionsWithFormDataResponse =
+  putColumnsPositionsWithFormDataResponseSuccess
 
-export const getPostColumnsReorderWithFormDataUrl = () => {
-  return `http://localhost:3333/columns/reorder`
+export const getPutColumnsPositionsWithFormDataUrl = () => {
+  return `http://localhost:3333/columns/positions`
 }
 
-export const postColumnsReorderWithFormData = async (
-  postColumnsReorderWithFormDataBodyThree: PostColumnsReorderWithFormDataBodyThree,
+export const putColumnsPositionsWithFormData = async (
+  putColumnsPositionsWithFormDataBodyThree: PutColumnsPositionsWithFormDataBodyThree,
   options?: RequestInit,
-): Promise<postColumnsReorderWithFormDataResponse> => {
+): Promise<putColumnsPositionsWithFormDataResponse> => {
   const formData = new FormData()
-  formData.append(`activeId`, postColumnsReorderWithFormDataBodyThree.activeId)
-  formData.append(`overId`, postColumnsReorderWithFormDataBodyThree.overId)
+  formData.append(
+    `projectId`,
+    putColumnsPositionsWithFormDataBodyThree.projectId,
+  )
+  putColumnsPositionsWithFormDataBodyThree.columnIds.forEach((value) =>
+    formData.append(`columnIds`, value),
+  )
 
-  const res = await fetch(getPostColumnsReorderWithFormDataUrl(), {
+  const res = await fetch(getPutColumnsPositionsWithFormDataUrl(), {
     credentials: 'include',
     ...options,
-    method: 'POST',
+    method: 'PUT',
     body: formData,
   })
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: postColumnsReorderWithFormDataResponse['data'] = body
+  const data: putColumnsPositionsWithFormDataResponse['data'] = body
     ? JSON.parse(body)
     : {}
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as postColumnsReorderWithFormDataResponse
+  } as putColumnsPositionsWithFormDataResponse
 }
 
-export const getPostColumnsReorderWithFormDataMutationOptions = <
+export const getPutColumnsPositionsWithFormDataMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postColumnsReorderWithFormData>>,
+    Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>,
     TError,
-    { data: PostColumnsReorderWithFormDataBodyThree },
+    { data: PutColumnsPositionsWithFormDataBodyThree },
     TContext
   >
   fetch?: RequestInit
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postColumnsReorderWithFormData>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>,
   TError,
-  { data: PostColumnsReorderWithFormDataBodyThree },
+  { data: PutColumnsPositionsWithFormDataBodyThree },
   TContext
 > => {
-  const mutationKey = ['postColumnsReorderWithFormData']
+  const mutationKey = ['putColumnsPositionsWithFormData']
   const { mutation: mutationOptions, fetch: fetchOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -1054,46 +1058,46 @@ export const getPostColumnsReorderWithFormDataMutationOptions = <
     : { mutation: { mutationKey }, fetch: undefined }
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postColumnsReorderWithFormData>>,
-    { data: PostColumnsReorderWithFormDataBodyThree }
+    Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>,
+    { data: PutColumnsPositionsWithFormDataBodyThree }
   > = (props) => {
     const { data } = props ?? {}
 
-    return postColumnsReorderWithFormData(data, fetchOptions)
+    return putColumnsPositionsWithFormData(data, fetchOptions)
   }
 
   return { mutationFn, ...mutationOptions }
 }
 
-export type PostColumnsReorderWithFormDataMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postColumnsReorderWithFormData>>
+export type PutColumnsPositionsWithFormDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>
 >
-export type PostColumnsReorderWithFormDataMutationBody =
-  PostColumnsReorderWithFormDataBodyThree
-export type PostColumnsReorderWithFormDataMutationError = unknown
+export type PutColumnsPositionsWithFormDataMutationBody =
+  PutColumnsPositionsWithFormDataBodyThree
+export type PutColumnsPositionsWithFormDataMutationError = unknown
 
-export const usePostColumnsReorderWithFormData = <
+export const usePutColumnsPositionsWithFormData = <
   TError = unknown,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postColumnsReorderWithFormData>>,
+      Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>,
       TError,
-      { data: PostColumnsReorderWithFormDataBodyThree },
+      { data: PutColumnsPositionsWithFormDataBodyThree },
       TContext
     >
     fetch?: RequestInit
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postColumnsReorderWithFormData>>,
+  Awaited<ReturnType<typeof putColumnsPositionsWithFormData>>,
   TError,
-  { data: PostColumnsReorderWithFormDataBodyThree },
+  { data: PutColumnsPositionsWithFormDataBodyThree },
   TContext
 > => {
   return useMutation(
-    getPostColumnsReorderWithFormDataMutationOptions(options),
+    getPutColumnsPositionsWithFormDataMutationOptions(options),
     queryClient,
   )
 }
@@ -1231,12 +1235,6 @@ export const putColumnsByIdWithUrlEncoded = async (
   if (putColumnsByIdWithUrlEncodedBodyTwo.title !== undefined) {
     formUrlEncoded.append(`title`, putColumnsByIdWithUrlEncodedBodyTwo.title)
   }
-  if (putColumnsByIdWithUrlEncodedBodyTwo.order !== undefined) {
-    formUrlEncoded.append(
-      `order`,
-      putColumnsByIdWithUrlEncodedBodyTwo.order.toString(),
-    )
-  }
 
   const res = await fetch(getPutColumnsByIdWithUrlEncodedUrl(id), {
     credentials: 'include',
@@ -1356,12 +1354,6 @@ export const putColumnsByIdWithFormData = async (
   const formData = new FormData()
   if (putColumnsByIdWithFormDataBodyThree.title !== undefined) {
     formData.append(`title`, putColumnsByIdWithFormDataBodyThree.title)
-  }
-  if (putColumnsByIdWithFormDataBodyThree.order !== undefined) {
-    formData.append(
-      `order`,
-      putColumnsByIdWithFormDataBodyThree.order.toString(),
-    )
   }
 
   const res = await fetch(getPutColumnsByIdWithFormDataUrl(id), {
