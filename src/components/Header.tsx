@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from '../lib/auth'
 import { Bell, Search, LogOut, Settings, Plus, Menu } from 'lucide-react'
+import { NotificationPopover } from './NotificationPopover'
 import { useState } from 'react'
 import { Input } from './ui/input'
 import {
@@ -72,13 +73,7 @@ export default function Header() {
         <div className="h-8 w-px bg-border/60 hidden md:block" />
 
         <div className="flex items-center gap-1 md:gap-2">
-          <button
-            className="relative p-2 md:p-2.5 rounded-lg text-black/80 hover:text-black hover:bg-black/15 transition-all duration-200 cursor-pointer"
-            aria-label="Notificações"
-          >
-            <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-400 rounded-full" />
-          </button>
+          <NotificationPopover />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
