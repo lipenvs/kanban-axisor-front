@@ -53,7 +53,6 @@ import {
 import type { GetAttachmentsByTaskId200 } from '@/lib/api/model/getAttachmentsByTaskId200'
 import type { GetAttachmentsByTaskId200AttachmentsItem } from '@/lib/api/model/getAttachmentsByTaskId200AttachmentsItem'
 import { useQueryClient } from '@tanstack/react-query'
-import { useWebSocket } from '@/hooks/useWebSocket'
 
 interface LocalAttachment {
   id: string
@@ -108,57 +107,15 @@ export default function TaskDialog({
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
-  const { on: onWebSocket } = useWebSocket()
 
   const { data: existingAttachmentsData } = useGetAttachmentsByTaskId(
     task?.id ?? '',
     { query: { enabled: !!task?.id && open } },
   )
-  const existingAttachments: GetAttachmentsByTaskId200AttachmentsItem[] = 
+  const existingAttachments: GetAttachmentsByTaskId200AttachmentsItem[] =
     (existingAttachmentsData?.data as GetAttachmentsByTaskId200 | undefined)?.attachments ?? []
 
   const { mutateAsync: deleteAttachment } = useDeleteAttachmentsById()
-
-  useEffect(() => {
-    if (!task?.id || !open) return
-
-    const unsubscribeScanning = onWebSocket('attachment:scanning', (data: { attachmentId: string; taskId: string; fileName: string }) => {
-      if (data.taskId === task.id) {
-        setUploadingAttachments((prev) => {
-          const next = new Map(prev)
-          next.set(data.attachmentId, { fileName: data.fileName, status: 'scanning' })
-          return next
-        })
-      }
-    })
-
-    const unsubscribeSaving = onWebSocket('attachment:saving', (data: { attachmentId: string; taskId: string; fileName: string }) => {
-      if (data.taskId === task.id) {
-        setUploadingAttachments((prev) => {
-          const next = new Map(prev)
-          next.set(data.attachmentId, { fileName: data.fileName, status: 'saving' })
-          return next
-        })
-      }
-    })
-
-    const unsubscribeCompleted = onWebSocket('attachment:completed', (data: { attachmentId: string; taskId: string; fileName: string }) => {
-      if (data.taskId === task.id) {
-        setUploadingAttachments((prev) => {
-          const next = new Map(prev)
-          next.delete(data.attachmentId)
-          return next
-        })
-        queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(task.id) })
-      }
-    })
-
-    return () => {
-      unsubscribeScanning()
-      unsubscribeSaving()
-      unsubscribeCompleted()
-    }
-  }, [task?.id, open, onWebSocket, queryClient])
 
   async function handleDeleteAttachment(attachmentId: string) {
     await deleteAttachment({ id: attachmentId })

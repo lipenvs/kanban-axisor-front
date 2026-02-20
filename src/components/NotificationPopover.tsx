@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
-import { useWebSocket } from '@/hooks/useWebSocket';
 
 interface Notification {
     id: string;
@@ -10,31 +8,9 @@ interface Notification {
     date: string;
 }
 
+const notifications: Notification[] = [];
+
 export function NotificationPopover() {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const { on: onWebSocket } = useWebSocket();
-
-    useEffect(() => {
-        const unsubscribe = onWebSocket('attachment:completed', (data: { attachmentId: string; taskId: string; fileName: string; status: string }) => {
-            if (data.status === 'clean') {
-                const newNotification: Notification = {
-                    id: data.attachmentId,
-                    message: `Arquivo "${data.fileName}" anexado com sucesso`,
-                    date: new Date().toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                    }),
-                };
-                setNotifications((prev) => [newNotification, ...prev].slice(0, 50));
-            }
-        });
-
-        return unsubscribe;
-    }, [onWebSocket]);
-
     const hasUnread = notifications.length > 0;
 
     return (

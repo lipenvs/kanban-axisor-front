@@ -23,10 +23,8 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import type {
-  GetColumns200,
   GetColumnsKanban200Item,
   GetColumnsKanbanParams,
-  GetColumnsParams,
   PostColumnsWithFormData201,
   PostColumnsWithFormDataBodyThree,
   PostColumnsWithJson201,
@@ -43,201 +41,6 @@ import type {
   PutColumnsPositionsWithJsonBodyOne,
   PutColumnsPositionsWithUrlEncodedBodyTwo,
 } from './model'
-
-export type getColumnsKanbanResponse200 = {
-  data: GetColumnsKanban200Item[]
-  status: 200
-}
-
-export type getColumnsKanbanResponseSuccess = getColumnsKanbanResponse200 & {
-  headers: Headers
-}
-
-export type getColumnsKanbanResponse = getColumnsKanbanResponseSuccess
-
-export const getGetColumnsKanbanUrl = (params: GetColumnsKanbanParams) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0
-    ? `http://localhost:3333/columns/kanban?${stringifiedParams}`
-    : `http://localhost:3333/columns/kanban`
-}
-
-export const getColumnsKanban = async (
-  params: GetColumnsKanbanParams,
-  options?: RequestInit,
-): Promise<getColumnsKanbanResponse> => {
-  const res = await fetch(getGetColumnsKanbanUrl(params), {
-    credentials: 'include',
-    ...options,
-    method: 'GET',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: getColumnsKanbanResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getColumnsKanbanResponse
-}
-
-export const getGetColumnsKanbanQueryKey = (
-  params?: GetColumnsKanbanParams,
-) => {
-  return [
-    `http://localhost:3333/columns/kanban`,
-    ...(params ? [params] : []),
-  ] as const
-}
-
-export const getGetColumnsKanbanQueryOptions = <
-  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
-  TError = unknown,
->(
-  params: GetColumnsKanbanParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getColumnsKanban>>,
-        TError,
-        TData
-      >
-    >
-    fetch?: RequestInit
-  },
-) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
-
-  const queryKey = queryOptions?.queryKey ?? getGetColumnsKanbanQueryKey(params)
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getColumnsKanban>>
-  > = ({ signal }) => getColumnsKanban(params, { signal, ...fetchOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getColumnsKanban>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetColumnsKanbanQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getColumnsKanban>>
->
-export type GetColumnsKanbanQueryError = unknown
-
-export function useGetColumnsKanban<
-  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
-  TError = unknown,
->(
-  params: GetColumnsKanbanParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getColumnsKanban>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getColumnsKanban>>,
-          TError,
-          Awaited<ReturnType<typeof getColumnsKanban>>
-        >,
-        'initialData'
-      >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetColumnsKanban<
-  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
-  TError = unknown,
->(
-  params: GetColumnsKanbanParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getColumnsKanban>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getColumnsKanban>>,
-          TError,
-          Awaited<ReturnType<typeof getColumnsKanban>>
-        >,
-        'initialData'
-      >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetColumnsKanban<
-  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
-  TError = unknown,
->(
-  params: GetColumnsKanbanParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getColumnsKanban>>,
-        TError,
-        TData
-      >
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-
-export function useGetColumnsKanban<
-  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
-  TError = unknown,
->(
-  params: GetColumnsKanbanParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getColumnsKanban>>,
-        TError,
-        TData
-      >
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetColumnsKanbanQueryOptions(params, options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-
-  return { ...query, queryKey: queryOptions.queryKey }
-}
 
 export type postColumnsWithJsonResponse201 = {
   data: PostColumnsWithJson201
@@ -575,18 +378,18 @@ export const usePostColumnsWithFormData = <
     queryClient,
   )
 }
-export type getColumnsResponse200 = {
-  data: GetColumns200
+export type getColumnsKanbanResponse200 = {
+  data: GetColumnsKanban200Item[]
   status: 200
 }
 
-export type getColumnsResponseSuccess = getColumnsResponse200 & {
+export type getColumnsKanbanResponseSuccess = getColumnsKanbanResponse200 & {
   headers: Headers
 }
 
-export type getColumnsResponse = getColumnsResponseSuccess
+export type getColumnsKanbanResponse = getColumnsKanbanResponseSuccess
 
-export const getGetColumnsUrl = (params: GetColumnsParams) => {
+export const getGetColumnsKanbanUrl = (params: GetColumnsKanbanParams) => {
   const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -602,11 +405,11 @@ export const getGetColumnsUrl = (params: GetColumnsParams) => {
     : `http://localhost:3333/columns/`
 }
 
-export const getColumns = async (
-  params: GetColumnsParams,
+export const getColumnsKanban = async (
+  params: GetColumnsKanbanParams,
   options?: RequestInit,
-): Promise<getColumnsResponse> => {
-  const res = await fetch(getGetColumnsUrl(params), {
+): Promise<getColumnsKanbanResponse> => {
+  const res = await fetch(getGetColumnsKanbanUrl(params), {
     credentials: 'include',
     ...options,
     method: 'GET',
@@ -614,67 +417,77 @@ export const getColumns = async (
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: getColumnsResponse['data'] = body ? JSON.parse(body) : {}
+  const data: getColumnsKanbanResponse['data'] = body ? JSON.parse(body) : {}
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as getColumnsResponse
+  } as getColumnsKanbanResponse
 }
 
-export const getGetColumnsQueryKey = (params?: GetColumnsParams) => {
+export const getGetColumnsKanbanQueryKey = (
+  params?: GetColumnsKanbanParams,
+) => {
   return [
     `http://localhost:3333/columns/`,
     ...(params ? [params] : []),
   ] as const
 }
 
-export const getGetColumnsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getColumns>>,
+export const getGetColumnsKanbanQueryOptions = <
+  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
   TError = unknown,
 >(
-  params: GetColumnsParams,
+  params: GetColumnsKanbanParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getColumns>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getColumnsKanban>>,
+        TError,
+        TData
+      >
     >
     fetch?: RequestInit
   },
 ) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetColumnsQueryKey(params)
+  const queryKey = queryOptions?.queryKey ?? getGetColumnsKanbanQueryKey(params)
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getColumns>>> = ({
-    signal,
-  }) => getColumns(params, { signal, ...fetchOptions })
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getColumnsKanban>>
+  > = ({ signal }) => getColumnsKanban(params, { signal, ...fetchOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getColumns>>,
+    Awaited<ReturnType<typeof getColumnsKanban>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetColumnsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getColumns>>
+export type GetColumnsKanbanQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getColumnsKanban>>
 >
-export type GetColumnsQueryError = unknown
+export type GetColumnsKanbanQueryError = unknown
 
-export function useGetColumns<
-  TData = Awaited<ReturnType<typeof getColumns>>,
+export function useGetColumnsKanban<
+  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
   TError = unknown,
 >(
-  params: GetColumnsParams,
+  params: GetColumnsKanbanParams,
   options: {
     query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getColumns>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getColumnsKanban>>,
+        TError,
+        TData
+      >
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getColumns>>,
+          Awaited<ReturnType<typeof getColumnsKanban>>,
           TError,
-          Awaited<ReturnType<typeof getColumns>>
+          Awaited<ReturnType<typeof getColumnsKanban>>
         >,
         'initialData'
       >
@@ -684,20 +497,24 @@ export function useGetColumns<
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetColumns<
-  TData = Awaited<ReturnType<typeof getColumns>>,
+export function useGetColumnsKanban<
+  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
   TError = unknown,
 >(
-  params: GetColumnsParams,
+  params: GetColumnsKanbanParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getColumns>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getColumnsKanban>>,
+        TError,
+        TData
+      >
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getColumns>>,
+          Awaited<ReturnType<typeof getColumnsKanban>>,
           TError,
-          Awaited<ReturnType<typeof getColumns>>
+          Awaited<ReturnType<typeof getColumnsKanban>>
         >,
         'initialData'
       >
@@ -707,14 +524,18 @@ export function useGetColumns<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetColumns<
-  TData = Awaited<ReturnType<typeof getColumns>>,
+export function useGetColumnsKanban<
+  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
   TError = unknown,
 >(
-  params: GetColumnsParams,
+  params: GetColumnsKanbanParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getColumns>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getColumnsKanban>>,
+        TError,
+        TData
+      >
     >
     fetch?: RequestInit
   },
@@ -723,14 +544,18 @@ export function useGetColumns<
   queryKey: DataTag<QueryKey, TData, TError>
 }
 
-export function useGetColumns<
-  TData = Awaited<ReturnType<typeof getColumns>>,
+export function useGetColumnsKanban<
+  TData = Awaited<ReturnType<typeof getColumnsKanban>>,
   TError = unknown,
 >(
-  params: GetColumnsParams,
+  params: GetColumnsKanbanParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getColumns>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getColumnsKanban>>,
+        TError,
+        TData
+      >
     >
     fetch?: RequestInit
   },
@@ -738,7 +563,7 @@ export function useGetColumns<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 } {
-  const queryOptions = getGetColumnsQueryOptions(params, options)
+  const queryOptions = getGetColumnsKanbanQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
