@@ -23,5 +23,5 @@ export type PutTasksByIdWithFormDataBodyThree = {
   description?: string
   /** @nullable */
   dueDate?: string | null
-  order?: string
+  order?: number
 }

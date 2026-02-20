@@ -23,5 +23,5 @@ export type PutTasksByIdWithUrlEncodedBodyTwo = {
   description?: string
   /** @nullable */
   dueDate?: string | null
-  order?: string
+  order?: number
 }

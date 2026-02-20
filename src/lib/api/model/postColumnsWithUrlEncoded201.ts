@@ -9,6 +9,6 @@
 export type PostColumnsWithUrlEncoded201 = {
   id: string
   title: string
-  order: string
+  order: number
   projectId: string
 }

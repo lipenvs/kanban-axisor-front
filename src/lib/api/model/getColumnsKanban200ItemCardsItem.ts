@@ -11,7 +11,7 @@ import type { GetColumnsKanban200ItemCardsItemLabel } from './getColumnsKanban20
 export type GetColumnsKanban200ItemCardsItem = {
   id: string
   title: string
-  order: string
+  order: number
   columnId: string
   /** @nullable */
   labelId: string | null

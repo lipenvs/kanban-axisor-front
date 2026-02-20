@@ -9,18 +9,32 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ColumnType } from "../Column";
+
+// TODO: Hook hipotético do react-query — substitua pela sua implementação real
+// import { useBoardReorder } from "./useBoardReorder";
 
 export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
   const [columns, setColumns] = useState<ColumnType[]>(initialData);
 
+  const snapshotRef = useRef<ColumnType[]>(initialData);
+
   useEffect(() => {
     setColumns(initialData);
   }, [initialData]);
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const isColumnDrag = activeId ? columns.some((c) => c.id === activeId) : false;
+
+  // TODO: Hook hipotético do react-query
+  // const { mutate: reorderBoard } = useBoardReorder({
+  //   onError: () => {
+  //     // Rollback para o estado anterior ao drag em caso de falha
+  //     setColumns(snapshotRef.current);
+  //   },
+  // });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,6 +57,7 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id);
+    snapshotRef.current = columns;
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -86,7 +101,7 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
       if (activeIndex === -1) {
         return prevState;
       }
-      
+
       const newIndex = () => {
         const putOnBelowLastItem =
           overIndex === overItems.length - 1 && delta.y > 0;
@@ -102,7 +117,7 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
           c.cards = [
             ...overItems.slice(0, newIndex()),
             activeItems[activeIndex],
-            ...overItems.slice(newIndex(), overItems.length)
+            ...overItems.slice(newIndex(), overItems.length),
           ];
           return c;
         } else {
@@ -121,37 +136,47 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
     if (!overId) return;
 
-    // Column reordering
+    let nextColumns = columns;
+
     if (columns.some((c) => c.id === activeId)) {
       const activeIndex = columns.findIndex((c) => c.id === activeId);
       const overIndex = columns.findIndex((c) => c.id === overId);
+
       if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
-        setColumns((prev) => arrayMove(prev, activeIndex, overIndex));
+        nextColumns = arrayMove(columns, activeIndex, overIndex);
+        setColumns(nextColumns);
       }
-      return;
-    }
+    } else {
+      const activeColumn = findColumn(activeId);
+      const overColumn = findColumn(overId);
 
-    // Card reordering
-    const activeColumn = findColumn(activeId);
-    const overColumn = findColumn(overId);
+      if (!activeColumn || !overColumn || activeColumn !== overColumn) return;
 
-    if (!activeColumn || !overColumn || activeColumn !== overColumn) {
-      return;
-    }
-    const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
-    const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
-    if (activeIndex !== overIndex) {
-      setColumns((prevState) => {
-        return prevState.map((column) => {
+      const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
+      const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
+
+      if (activeIndex !== overIndex) {
+        nextColumns = columns.map((column) => {
           if (column.id === activeColumn.id) {
-            column.cards = arrayMove(overColumn.cards, activeIndex, overIndex);
-            return column;
-          } else {
-            return column;
+            return {
+              ...column,
+              cards: arrayMove(overColumn.cards, activeIndex, overIndex),
+            };
           }
+          return column;
         });
-      });
+        setColumns(nextColumns);
+      }
     }
+
+    // TODO:Persiste no backend apenas no dragEnd — dispara uma única vez
+    // com o estado final após o usuário soltar o card/coluna.
+    // reorderBoard({
+    //   columns: nextColumns.map((col) => ({
+    //     id: col.id,
+    //     cardIds: col.cards.map((card) => card.id),
+    //   })),
+    // });
   };
 
   const getActiveCard = () => {
