@@ -5,10 +5,10 @@
  * Development documentation
  * OpenAPI spec version: 0.0.0
  */
-import type { GetColumnsKanban200ItemCardsItemAssignee } from './getColumnsKanban200ItemCardsItemAssignee'
-import type { GetColumnsKanban200ItemCardsItemLabel } from './getColumnsKanban200ItemCardsItemLabel'
+import type { GetColumnsWithTasks200ItemCardsItemAssignee } from './getColumnsWithTasks200ItemCardsItemAssignee'
+import type { GetColumnsWithTasks200ItemCardsItemLabel } from './getColumnsWithTasks200ItemCardsItemLabel'
 
-export type GetColumnsKanban200ItemCardsItem = {
+export type GetColumnsWithTasks200ItemCardsItem = {
   id: string
   title: string
   order: number
@@ -26,7 +26,7 @@ export type GetColumnsKanban200ItemCardsItem = {
   /** @nullable */
   updatedAt?: string | null
   /** @nullable */
-  label?: GetColumnsKanban200ItemCardsItemLabel
+  label?: GetColumnsWithTasks200ItemCardsItemLabel
   /** @nullable */
-  assignee?: GetColumnsKanban200ItemCardsItemAssignee
+  assignee?: GetColumnsWithTasks200ItemCardsItemAssignee
 }

@@ -9,7 +9,7 @@
 /**
  * @nullable
  */
-export type GetColumnsKanban200ItemCardsItemAssignee = {
+export type GetColumnsWithTasks200ItemCardsItemAssignee = {
   name: string
   /** @nullable */
   image: string | null

@@ -16,7 +16,7 @@ import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useGetColumnsKanban, usePostColumnsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
+import { useGetColumnsWithTasks, usePostColumnsWithJson, getGetColumnsWithTasksQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
 import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
@@ -47,7 +47,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
   const [deletingColumnId, setDeletingColumnId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
-  const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsKanban({ projectId });
+  const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsWithTasks({ projectId });
   const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
   const { data: labelsData } = useGetLabelsByProjectId(projectId);
 
@@ -101,7 +101,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
       { data: { title, projectId } },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+          queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
         },
         onError: () => {
           toast.error("Não foi possível criar a coluna. Tente novamente.");
@@ -137,7 +137,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
             if (data.files && data.files.length > 0) {
               await uploadFiles(editingTaskId, data.files);
             }
-            queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+            queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setEditingTaskId(null);
             toast.success("Tarefa atualizada com sucesso.");
@@ -164,7 +164,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
             if (data.files && data.files.length > 0) {
               await uploadFiles(response.data.id, data.files);
             }
-            queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+            queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setCreateTaskColumnId(null);
             toast.success("Tarefa criada com sucesso.");
@@ -187,7 +187,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
         { id: deletingTaskId },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+            queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setDeletingTaskId(null);
             toast.success("Tarefa excluída com sucesso.");
@@ -217,7 +217,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
         { id: deletingColumnId },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+            queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
             setDeletingColumnId(null);
             toast.success("Coluna excluída com sucesso.");
           },
@@ -243,7 +243,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
         },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+            queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
             setIsColumnDialogOpen(false);
             setEditingColumnId(null);
           }

@@ -10,10 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { GetColumnsKanban200Item } from "../../lib/api/model/getColumnsKanban200Item";
+import type { GetColumnsWithTasks200Item } from "../../lib/api/model/getColumnsWithTasks200Item";
 import Card from "./Card";
 
-export type ColumnType = GetColumnsKanban200Item;
+export type ColumnType = GetColumnsWithTasks200Item;
 
 interface ColumnProps extends ColumnType {
   onCreateTask: (columnId: string) => void;

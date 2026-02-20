@@ -9,7 +9,7 @@
 /**
  * @nullable
  */
-export type GetColumnsKanban200ItemCardsItemLabel = {
+export type GetColumnsWithTasks200ItemCardsItemLabel = {
   name: string
   color: string
 } | null
