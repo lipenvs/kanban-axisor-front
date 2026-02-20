@@ -29,4 +29,5 @@ export type GetColumnsWithTasks200ItemCardsItem = {
   label?: GetColumnsWithTasks200ItemCardsItemLabel
   /** @nullable */
   assignee?: GetColumnsWithTasks200ItemCardsItemAssignee
+  attachmentCount: number
 }
