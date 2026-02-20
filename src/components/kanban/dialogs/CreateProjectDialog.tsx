@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { getGetProjectsQueryKey, usePostProjectsWithJson } from '@/lib/api/project'
 
 interface CreateProjectDialogProps {
@@ -35,6 +36,9 @@ export function CreateProjectDialog({
         setName('')
         navigate({ to: '/tasks/$projectId', params: { projectId: response.data.id } })
         queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
+      },
+      onError: () => {
+        toast.error('Não foi possível criar o projeto. Tente novamente.')
       },
     },
   })

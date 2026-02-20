@@ -7,6 +7,7 @@ import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson, useDeleteProjectsById } from '@/lib/api/project'
 import TaskBoard from '@/components/kanban/TaskBoard'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
   component: TasksPage,
@@ -38,7 +39,11 @@ function TasksPage() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetProjectsQueryKey() })
         setShowDeleteDialog(false)
+        toast.success("Projeto excluído com sucesso.")
         navigate({ to: '/tasks' })
+      },
+      onError: () => {
+        toast.error("Não foi possível excluir o projeto. Tente novamente.")
       },
     },
   })

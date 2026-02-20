@@ -12,6 +12,7 @@ import { Input } from '../../ui/input'
 import { Button } from '../../ui/button'
 import { usePostLabelsWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 const CATEGORY_COLORS = [
   '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B',
@@ -42,6 +43,10 @@ export function CreateLabelDialog({
         setNewLabelName('')
         setNewLabelColor(CATEGORY_COLORS[0])
         onOpenChange(false)
+        toast.success("Etiqueta criada com sucesso.")
+      },
+      onError: () => {
+        toast.error("Não foi possível criar a etiqueta. Tente novamente.")
       },
     },
   })

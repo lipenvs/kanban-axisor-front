@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -48,6 +49,7 @@ function RegisterPage() {
         },
         {
           onSuccess: () => {
+            toast.success('Conta criada com sucesso.')
             navigate({
               to: '/tasks',
             })

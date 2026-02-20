@@ -20,6 +20,7 @@ import { EditLabelDialog } from './kanban/dialogs/EditLabelDialog'
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSidebar } from './SidebarContext'
+import { toast } from 'sonner'
 
 export default function Sidebar() {
   const [showAddLabel, setShowAddLabel] = useState(false)
@@ -48,7 +49,7 @@ export default function Sidebar() {
   )
   const labels = labelsResponse?.data?.labels ?? []
 
-  const deleteLabelMutation = useDeleteLabelsById({
+  const { mutate: deleteLabel, isPending } = useDeleteLabelsById({
     mutation: {
       onSuccess: () => {
         if (selectedProjectId) {
@@ -57,8 +58,12 @@ export default function Sidebar() {
           })
           setShowDeleteDialog(false)
           setLabelToDelete(null)
+          toast.success("Etiqueta excluída com sucesso.")
         }
-      }
+      },
+      onError: () => {
+        toast.error("Não foi possível excluir a etiqueta. Tente novamente.")
+      },
     }
   })
 
@@ -249,8 +254,8 @@ export default function Sidebar() {
                 <span className="font-bold">{labelToDelete.name}</span>?
               </p>
             }
-            onConfirm={() => deleteLabelMutation.mutate({ id: labelToDelete.id })}
-            isPending={deleteLabelMutation.isPending}
+            onConfirm={() => deleteLabel({ id: labelToDelete.id })}
+            isPending={isPending}
           />
         )}
       </aside>

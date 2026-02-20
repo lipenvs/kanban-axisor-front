@@ -15,6 +15,7 @@ import TaskDialog from "./TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useGetColumnsKanban, usePostColumnsWithJson, usePutColumnsPositionsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
@@ -113,6 +114,9 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
         queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
         queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
       },
+      onError: () => {
+        toast.error("Não foi possível reordenar as tarefas. Tente novamente.");
+      },
     },
   });
   const { mutate: saveColumnPositions } = usePutColumnsPositionsWithJson({
@@ -130,6 +134,9 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
         },
+        onError: () => {
+          toast.error("Não foi possível criar a coluna. Tente novamente.");
+        }
       }
     );
   };
@@ -164,7 +171,11 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setEditingTaskId(null);
-          }
+            toast.success("Tarefa atualizada com sucesso.");
+          },
+          onError: () => {
+            toast.error("Não foi possível atualizar a tarefa. Tente novamente.");
+          },
         }
       )
     } else if (createTaskColumnId) {
@@ -187,6 +198,10 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setCreateTaskColumnId(null);
+            toast.success("Tarefa criada com sucesso.");
+          },
+          onError: () => {
+            toast.error("Não foi possível criar a tarefa. Tente novamente.");
           },
         }
       );
@@ -206,6 +221,10 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setDeletingTaskId(null);
+            toast.success("Tarefa excluída com sucesso.");
+          },
+          onError: () => {
+            toast.error("Não foi possível excluir a tarefa. Tente novamente.");
           },
         }
       );
@@ -231,6 +250,10 @@ export default function TaskBoard({ projectId }: TaskBoardProps) {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
             setDeletingColumnId(null);
+            toast.success("Coluna excluída com sucesso.");
+          },
+          onError: () => {
+            toast.error("Não foi possível excluir a coluna. Tente novamente.");
           },
         }
       );

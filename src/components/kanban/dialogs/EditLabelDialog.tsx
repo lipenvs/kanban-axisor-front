@@ -12,6 +12,7 @@ import { Input } from '../../ui/input'
 import { Button } from '../../ui/button'
 import { usePutLabelsByIdWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 const CATEGORY_COLORS = [
   '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B',
@@ -47,6 +48,10 @@ export function EditLabelDialog({
           queryKey: getGetLabelsByProjectIdQueryKey(label.projectId),
         })
         onOpenChange(false)
+        toast.success("Etiqueta atualizada com sucesso.")
+      },
+      onError: () => {
+        toast.error("Não foi possível atualizar a etiqueta. Tente novamente.")
       },
     },
   })
