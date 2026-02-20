@@ -7,24 +7,14 @@
  */
 
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
 } from '@tanstack/react-query'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 import type {
-  GetTasks200,
-  GetTasksParams,
   PatchTasksReorderWithFormDataBodyThree,
   PatchTasksReorderWithJsonBodyOne,
   PatchTasksReorderWithUrlEncodedBodyTwo,
@@ -416,172 +406,6 @@ export const usePostTasksWithFormData = <TError = unknown, TContext = unknown>(
     queryClient,
   )
 }
-export type getTasksResponse200 = {
-  data: GetTasks200
-  status: 200
-}
-
-export type getTasksResponseSuccess = getTasksResponse200 & {
-  headers: Headers
-}
-
-export type getTasksResponse = getTasksResponseSuccess
-
-export const getGetTasksUrl = (params: GetTasksParams) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0
-    ? `http://localhost:3333/tasks/?${stringifiedParams}`
-    : `http://localhost:3333/tasks/`
-}
-
-export const getTasks = async (
-  params: GetTasksParams,
-  options?: RequestInit,
-): Promise<getTasksResponse> => {
-  const res = await fetch(getGetTasksUrl(params), {
-    credentials: 'include',
-    ...options,
-    method: 'GET',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: getTasksResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getTasksResponse
-}
-
-export const getGetTasksQueryKey = (params?: GetTasksParams) => {
-  return [`http://localhost:3333/tasks/`, ...(params ? [params] : [])] as const
-}
-
-export const getGetTasksQueryOptions = <
-  TData = Awaited<ReturnType<typeof getTasks>>,
-  TError = unknown,
->(
-  params: GetTasksParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
-    >
-    fetch?: RequestInit
-  },
-) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
-
-  const queryKey = queryOptions?.queryKey ?? getGetTasksQueryKey(params)
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTasks>>> = ({
-    signal,
-  }) => getTasks(params, { signal, ...fetchOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getTasks>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetTasksQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getTasks>>
->
-export type GetTasksQueryError = unknown
-
-export function useGetTasks<
-  TData = Awaited<ReturnType<typeof getTasks>>,
-  TError = unknown,
->(
-  params: GetTasksParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTasks>>,
-          TError,
-          Awaited<ReturnType<typeof getTasks>>
-        >,
-        'initialData'
-      >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetTasks<
-  TData = Awaited<ReturnType<typeof getTasks>>,
-  TError = unknown,
->(
-  params: GetTasksParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTasks>>,
-          TError,
-          Awaited<ReturnType<typeof getTasks>>
-        >,
-        'initialData'
-      >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetTasks<
-  TData = Awaited<ReturnType<typeof getTasks>>,
-  TError = unknown,
->(
-  params: GetTasksParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-
-export function useGetTasks<
-  TData = Awaited<ReturnType<typeof getTasks>>,
-  TError = unknown,
->(
-  params: GetTasksParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>
-    >
-    fetch?: RequestInit
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetTasksQueryOptions(params, options)
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-
-  return { ...query, queryKey: queryOptions.queryKey }
-}
-
 export type putTasksByIdWithJsonResponse200 = {
   data: PutTasksByIdWithJson200
   status: 200

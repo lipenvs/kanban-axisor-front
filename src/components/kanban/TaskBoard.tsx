@@ -17,7 +17,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetColumnsWithTasks, usePostColumnsWithJson, getGetColumnsWithTasksQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
-import { usePostTasksWithJson, useDeleteTasksById, useGetTasks, usePutTasksByIdWithJson, getGetTasksQueryKey } from "../../lib/api/task";
+import { usePostTasksWithJson, useDeleteTasksById, usePutTasksByIdWithJson } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
 import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
@@ -48,7 +48,7 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
 
   const queryClient = useQueryClient();
   const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsWithTasks({ projectId });
-  const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
+
   const { data: labelsData } = useGetLabelsByProjectId(projectId);
 
   const filteredKanbanColumns = useMemo(() => {
@@ -138,7 +138,6 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
               await uploadFiles(editingTaskId, data.files);
             }
             queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
-            queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setEditingTaskId(null);
             toast.success("Tarefa atualizada com sucesso.");
           },
@@ -165,7 +164,6 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
               await uploadFiles(response.data.id, data.files);
             }
             queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
-            queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setCreateTaskColumnId(null);
             toast.success("Tarefa criada com sucesso.");
           },
@@ -188,7 +186,6 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId }) });
-            queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey({ projectId }) });
             setDeletingTaskId(null);
             toast.success("Tarefa excluída com sucesso.");
           },
@@ -254,12 +251,11 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
     }
   };
 
-  if (isLoadingKanban || isLoadingTasks) {
+  if (isLoadingKanban) {
     return <div className="flex items-center justify-center w-full h-full">Carregando...</div>;
   }
 
-  const editingTask = editingTaskId ? tasksData?.data.tasks.find(t => t.id === editingTaskId) : null;
-
+  const editingTask = editingTaskId ? columns.flatMap(c => c.cards).find(t => t.id === editingTaskId) : null;
 
   return (
     <DndContext

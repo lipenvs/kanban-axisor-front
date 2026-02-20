@@ -42,7 +42,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Upload, X, FileText, Paperclip, Check, ChevronsUpDown, ShieldCheck, ShieldAlert, Loader2, Download, Trash2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import type { GetTasks200TasksItem } from '@/lib/api/model'
+import type { GetColumnsWithTasks200ItemCardsItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 import {
   useGetAttachmentsByTaskId,
@@ -64,7 +64,7 @@ interface LocalAttachment {
 interface TaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  task?: GetTasks200TasksItem | null
+  task?: GetColumnsWithTasks200ItemCardsItem | null
   labels: GetLabelsByProjectId200LabelsItem[]
   onSubmit: (data: {
     title: string
@@ -102,7 +102,7 @@ export default function TaskDialog({
 }: TaskDialogProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
-  const [uploadingAttachments, setUploadingAttachments] = useState<Map<string, { fileName: string; status: 'scanning' | 'saving' }>>(new Map())
+  const [uploadingAttachments] = useState<Map<string, { fileName: string; status: 'scanning' | 'saving' }>>(new Map())
 
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
