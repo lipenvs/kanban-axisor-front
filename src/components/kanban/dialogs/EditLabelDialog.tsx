@@ -11,6 +11,7 @@ import { Label } from '../../ui/label'
 import { Input } from '../../ui/input'
 import { Button } from '../../ui/button'
 import { usePutLabelsByIdWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
+import { getGetColumnsWithTasksQueryKey } from '@/lib/api/column'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -46,6 +47,9 @@ export function EditLabelDialog({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: getGetLabelsByProjectIdQueryKey(label.projectId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: getGetColumnsWithTasksQueryKey({ projectId: label.projectId }),
         })
         onOpenChange(false)
         toast.success("Etiqueta atualizada com sucesso.")

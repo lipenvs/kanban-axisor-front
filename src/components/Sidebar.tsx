@@ -15,6 +15,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useParams, useMatchRoute, useRouterState } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
 import { useGetLabelsByProjectId, useDeleteLabelsById, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
+import { getGetColumnsWithTasksQueryKey } from '@/lib/api/column'
 import { CreateLabelDialog } from './kanban/dialogs/CreateLabelDialog'
 import { EditLabelDialog } from './kanban/dialogs/EditLabelDialog'
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
@@ -61,6 +62,9 @@ export default function Sidebar() {
         if (selectedProjectId) {
           queryClient.invalidateQueries({
             queryKey: getGetLabelsByProjectIdQueryKey(selectedProjectId)
+          })
+          queryClient.invalidateQueries({
+            queryKey: getGetColumnsWithTasksQueryKey({ projectId: selectedProjectId })
           })
           setShowDeleteDialog(false)
           setLabelToDelete(null)
@@ -176,11 +180,10 @@ export default function Sidebar() {
               {labels.map((cat) => (
                 <div key={cat.id} className="flex flex-col">
                   <div
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors group select-none cursor-pointer ${
-                      selectedLabelId === cat.id
-                        ? 'bg-accent text-accent-foreground'
-                        : 'hover:bg-accent'
-                    }`}
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors group select-none cursor-pointer ${selectedLabelId === cat.id
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-accent'
+                      }`}
                     onClick={() => {
                       if (!selectedProjectId) return
                       setExpandedActions(null)
@@ -200,11 +203,10 @@ export default function Sidebar() {
                         style={{ backgroundColor: cat.color }}
                       />
                       <span
-                        className={`text-sm transition-colors ${
-                          selectedLabelId === cat.id
-                            ? 'text-accent-foreground'
-                            : 'text-muted-foreground group-hover:text-foreground'
-                        }`}
+                        className={`text-sm transition-colors ${selectedLabelId === cat.id
+                          ? 'text-accent-foreground'
+                          : 'text-muted-foreground group-hover:text-foreground'
+                          }`}
                       >
                         {cat.name}
                       </span>

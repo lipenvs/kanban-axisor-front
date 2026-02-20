@@ -11,6 +11,7 @@ import { Label } from '../../ui/label'
 import { Input } from '../../ui/input'
 import { Button } from '../../ui/button'
 import { usePostLabelsWithJson, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
+import { getGetColumnsWithTasksQueryKey } from '@/lib/api/column'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -39,6 +40,9 @@ export function CreateLabelDialog({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: getGetLabelsByProjectIdQueryKey(projectId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: getGetColumnsWithTasksQueryKey({ projectId }),
         })
         setNewLabelName('')
         setNewLabelColor(CATEGORY_COLORS[0])
