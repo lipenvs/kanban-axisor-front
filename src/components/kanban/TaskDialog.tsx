@@ -50,7 +50,10 @@ import {
   useDeleteAttachmentsById,
   getGetAttachmentsDownloadByIdUrl,
 } from '@/lib/api/attachment'
+import type { GetAttachmentsByTaskId200 } from '@/lib/api/model/getAttachmentsByTaskId200'
+import type { GetAttachmentsByTaskId200AttachmentsItem } from '@/lib/api/model/getAttachmentsByTaskId200AttachmentsItem'
 import { useQueryClient } from '@tanstack/react-query'
+import { useWebSocket } from '@/hooks/useWebSocket'
 
 interface LocalAttachment {
   id: string
@@ -81,7 +84,7 @@ const taskFormSchema = z.object({
   dueDate: z.string(),
   labelId: z.string(),
   assigneeId: z.string(),
-  attachments: z.array(z.any()),
+  attachments: z.array(z.custom<LocalAttachment>()),
 })
 
 function formatFileSize(bytes: number) {
@@ -100,18 +103,62 @@ export default function TaskDialog({
 }: TaskDialogProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
+  const [uploadingAttachments, setUploadingAttachments] = useState<Map<string, { fileName: string; status: 'scanning' | 'saving' }>>(new Map())
 
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
+  const { on: onWebSocket } = useWebSocket()
 
   const { data: existingAttachmentsData } = useGetAttachmentsByTaskId(
     task?.id ?? '',
     { query: { enabled: !!task?.id && open } },
   )
-  const existingAttachments = (existingAttachmentsData?.data as any)?.attachments ?? []
+  const existingAttachments: GetAttachmentsByTaskId200AttachmentsItem[] = 
+    (existingAttachmentsData?.data as GetAttachmentsByTaskId200 | undefined)?.attachments ?? []
 
   const { mutateAsync: deleteAttachment } = useDeleteAttachmentsById()
+
+  useEffect(() => {
+    if (!task?.id || !open) return
+
+    const unsubscribeScanning = onWebSocket('attachment:scanning', (data: { attachmentId: string; taskId: string; fileName: string }) => {
+      if (data.taskId === task.id) {
+        setUploadingAttachments((prev) => {
+          const next = new Map(prev)
+          next.set(data.attachmentId, { fileName: data.fileName, status: 'scanning' })
+          return next
+        })
+      }
+    })
+
+    const unsubscribeSaving = onWebSocket('attachment:saving', (data: { attachmentId: string; taskId: string; fileName: string }) => {
+      if (data.taskId === task.id) {
+        setUploadingAttachments((prev) => {
+          const next = new Map(prev)
+          next.set(data.attachmentId, { fileName: data.fileName, status: 'saving' })
+          return next
+        })
+      }
+    })
+
+    const unsubscribeCompleted = onWebSocket('attachment:completed', (data: { attachmentId: string; taskId: string; fileName: string }) => {
+      if (data.taskId === task.id) {
+        setUploadingAttachments((prev) => {
+          const next = new Map(prev)
+          next.delete(data.attachmentId)
+          return next
+        })
+        queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(task.id) })
+      }
+    })
+
+    return () => {
+      unsubscribeScanning()
+      unsubscribeSaving()
+      unsubscribeCompleted()
+    }
+  }, [task?.id, open, onWebSocket, queryClient])
 
   async function handleDeleteAttachment(attachmentId: string) {
     await deleteAttachment({ id: attachmentId })
@@ -409,9 +456,36 @@ export default function TaskDialog({
               />
             </div>
 
+            {uploadingAttachments.size > 0 && (
+              <div className="space-y-2 mt-3">
+                {Array.from(uploadingAttachments.entries()).map(([attachmentId, attachment]) => (
+                  <div
+                    key={attachmentId}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/40"
+                  >
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">
+                        {attachment.fileName}
+                      </p>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        {attachment.status === 'scanning' ? 'Escaneando arquivo...' : 'Gravando arquivo...'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {existingAttachments.length > 0 && (
               <div className="space-y-2 mt-3">
-                {existingAttachments.map((att: any) => (
+                {existingAttachments.map((att) => (
                   <div
                     key={att.id}
                     className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/40 group/att"

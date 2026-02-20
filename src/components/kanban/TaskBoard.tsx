@@ -13,7 +13,7 @@ import Card from "./Card";
 import ColumnDialog from "./ColumnDialog";
 import TaskDialog from "./TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetColumnsKanban, usePostColumnsWithJson, usePutColumnsPositionsWithJson, getGetColumnsKanbanQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
@@ -23,6 +23,7 @@ import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQue
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 import { usePostTasksReorderWithJson } from "../../lib/api/task";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -51,6 +52,15 @@ export default function TaskBoard({ projectId, labelId }: TaskBoardProps) {
   const { data: kanbanData, isLoading: isLoadingKanban } = useGetColumnsKanban({ projectId });
   const { data: tasksData, isLoading: isLoadingTasks } = useGetTasks({ projectId });
   const { data: labelsData } = useGetLabelsByProjectId(projectId);
+  const { on: onWebSocket } = useWebSocket();
+
+  useEffect(() => {
+    const unsubscribe = onWebSocket('attachment:completed', () => {
+      queryClient.invalidateQueries({ queryKey: getGetColumnsKanbanQueryKey({ projectId }) });
+    });
+
+    return unsubscribe;
+  }, [projectId, onWebSocket, queryClient]);
 
   const filteredKanbanColumns = useMemo(() => {
     const baseColumns = kanbanData?.data ?? [];

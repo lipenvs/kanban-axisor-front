@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, Trash2, User } from "lucide-react";
+import { Calendar, Trash2, User, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import type { GetColumnsKanban200ItemCardsItem } from "../../lib/api/model/getColumnsKanban200ItemCardsItem";
@@ -72,6 +72,13 @@ const Card = ({ card, onDelete, onClick }: CardProps) => {
             <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
               <Calendar className="w-3 h-3" />
               {new Date(card.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+            </span>
+          )}
+
+          {(card as any).attachmentCount > 0 && (
+            <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
+              <Paperclip className="w-3 h-3" />
+              {(card as any).attachmentCount}
             </span>
           )}
         </div>
