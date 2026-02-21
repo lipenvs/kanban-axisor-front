@@ -11,7 +11,7 @@ interface Notification {
 
 interface ScanStore {
   scanningAttachmentIds: Set<string>;
-  scanningTaskIds: Map<string, number>; // taskId -> count of scanning attachments
+  scanningTaskIds: Map<string, number>;
   notifications: Notification[];
   addScanningAttachment: (taskId: string, attachmentId: string) => void;
   removeScanningAttachment: (taskId: string, attachmentId: string) => void;

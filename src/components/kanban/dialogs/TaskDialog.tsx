@@ -468,23 +468,26 @@ export default function TaskDialog({
                       </span>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      {att.status === 'clean' ? (
-                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                      ) : att.status === 'infected' || att.status === 'error' ? (
-                        <ShieldAlert className="w-4 h-4 text-red-500" />
-                      ) : (
-                        <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
-                      )}
-                      {scanningAttachmentIds.has(att.id) && (
-                        <span className="text-[10px] text-blue-500 flex items-center gap-1 ml-1 font-medium bg-blue-50 px-1.5 py-0.5 rounded-full animate-pulse">
+                      {scanningAttachmentIds.has(att.id) ? (
+                        <span className="text-[10px] text-blue-500 flex items-center gap-1 ml-1 font-medium bg-blue-50 px-1.5 py-0.5 rounded-full animate-pulse shrink-0">
                           <Loader2 className="w-3 h-3 animate-spin" />
                           Escaneando...
                         </span>
+                      ) : (
+                        <div className="shrink-0">
+                          {att.status === 'clean' ? (
+                            <ShieldCheck className="w-4 h-4 text-green-500" />
+                          ) : att.status === 'infected' || att.status === 'error' ? (
+                            <ShieldAlert className="w-4 h-4 text-red-500" />
+                          ) : (
+                            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                          )}
+                        </div>
                       )}
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
                         asChild
                       >
                         <a
@@ -498,7 +501,7 @@ export default function TaskDialog({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive cursor-pointer"
                         onClick={() => handleDeleteAttachment(att.id)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -531,7 +534,7 @@ export default function TaskDialog({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 shrink-0 opacity-0 group-hover/att:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive cursor-pointer"
                         onClick={() => field.handleChange(field.state.value.filter((a) => a.id !== attachment.id))}
                       >
                         <X className="w-3.5 h-3.5" />
