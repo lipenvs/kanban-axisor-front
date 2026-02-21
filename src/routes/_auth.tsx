@@ -45,7 +45,7 @@ function AuthLayout() {
       </div>
 
       {emailNotVerified && (
-        <div className="fixed bottom-0 left-0 w-full z-[100] bg-yellow-400 text-black text-center py-2 font-semibold text-sm shadow-lg">
+        <div className="fixed bottom-0 left-0 w-full z-[100] bg-neutral-800 text-white text-center py-2 font-semibold text-sm shadow-lg">
           Seu email ainda não foi verificado. Confirme seu email para manter sua conta ativa.
         </div>
       )}
