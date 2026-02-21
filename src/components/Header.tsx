@@ -1,4 +1,4 @@
-import { useNavigate, useMatchRoute, useRouterState, useParams } from '@tanstack/react-router'
+import { useNavigate, useRouterState, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from '../lib/auth'
 import { Search, LogOut, Settings, Plus, Menu } from 'lucide-react'
@@ -22,30 +22,33 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddProject, setShowAddProject] = useState(false)
   const { toggle } = useSidebar()
-  const matchRoute = useMatchRoute()
-  const isTasksPage = matchRoute({ to: '/tasks' }) || matchRoute({ to: '/tasks/$projectId' })
+  const { pathname, search: locationSearch } = useRouterState({
+    select: (s) => ({
+      pathname: s.location.pathname,
+      search: s.location.search
+    })
+  })
+  const isTasksPage = pathname.includes('/tasks') || pathname === '/'
   const params = useParams({ strict: false }) as { projectId?: string }
-  
-  const locationSearch = useRouterState({ select: (s) => s.location.search })
+
   const urlSearchQuery = useMemo(() => {
     const sp = new URLSearchParams(locationSearch)
     return sp.get('search') || ''
   }, [locationSearch])
 
-  // Sincronizar estado local com URL
   useEffect(() => {
     setSearchQuery(urlSearchQuery)
   }, [urlSearchQuery])
 
-  // Debounce para atualizar URL
   useEffect(() => {
-    if (!isTasksPage || !params.projectId) return
-    
+    const projectId = params.projectId
+    if (!isTasksPage || !projectId) return
+
     const timer = setTimeout(() => {
       if (searchQuery !== urlSearchQuery) {
         navigate({
           to: '/tasks/$projectId',
-          params: { projectId: params.projectId },
+          params: { projectId },
           search: (prev) => ({
             ...prev,
             search: searchQuery.trim() || undefined,

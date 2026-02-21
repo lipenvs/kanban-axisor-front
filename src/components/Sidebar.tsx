@@ -12,7 +12,7 @@ import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams, useMatchRoute, useRouterState } from '@tanstack/react-router'
+import { useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { useGetProjects } from '@/lib/api/project'
 import { useGetLabelsByProjectId, useDeleteLabelsById, getGetLabelsByProjectIdQueryKey } from '@/lib/api/label'
 import { getGetColumnsWithTasksQueryKey } from '@/lib/api/column'
@@ -31,11 +31,16 @@ export default function Sidebar() {
   const params = useParams({ strict: false }) as { projectId?: string }
   const selectedProjectId = params.projectId
   const { open, close } = useSidebar()
-  const matchRoute = useMatchRoute()
-  const isMembers = matchRoute({ to: '/members' })
-  const isTasks = !isMembers
+  const { pathname, search: locationSearch } = useRouterState({
+    select: (s) => ({
+      pathname: s.location.pathname,
+      search: s.location.search
+    })
+  })
 
-  const locationSearch = useRouterState({ select: (s) => s.location.search })
+  const isMembers = pathname.includes('/members')
+  const isTasks = pathname.includes('/tasks') || pathname === '/'
+
   const selectedLabelId = useMemo(() => {
     const sp = new URLSearchParams(locationSearch)
     return sp.get('labelId')
