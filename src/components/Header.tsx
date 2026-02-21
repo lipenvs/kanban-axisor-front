@@ -16,14 +16,20 @@ import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import { CreateProjectDialog } from './kanban/dialogs/CreateProjectDialog'
 import { SettingsDialog } from './kanban/dialogs/SettingsDialog'
-import { useSidebar } from './SidebarContext'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from './ui/sheet'
+import Sidebar from './Sidebar'
 
 export default function Header() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddProject, setShowAddProject] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const { toggle } = useSidebar()
   const { pathname, search: locationSearch } = useRouterState({
     select: (s) => ({
       pathname: s.location.pathname,
@@ -78,14 +84,23 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 gap-3 shrink-0">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="lg:hidden shrink-0"
-        onClick={toggle}
-      >
-        <Menu className="w-5 h-5" />
-      </Button>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden shrink-0"
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-[260px] border-none">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+          <Sidebar className="border-none" />
+        </SheetContent>
+      </Sheet>
 
       {isTasksPage ? (
         <div className="flex items-center gap-3 flex-1 max-w-md">
