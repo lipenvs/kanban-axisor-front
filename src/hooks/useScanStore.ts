@@ -64,7 +64,6 @@ export const useScanStore = create<ScanStore>((set) => ({
         timestamp: Date.now(),
         read: false,
       };
-      console.log('Adding notification to store:', newNotification);
       return {
         notifications: [newNotification, ...state.notifications].slice(0, 50),
       };

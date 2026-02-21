@@ -76,7 +76,6 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 gap-3 shrink-0">
-      {/* Mobile menu button */}
       <Button
         variant="ghost"
         size="icon"

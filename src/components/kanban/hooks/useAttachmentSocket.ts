@@ -14,14 +14,9 @@ export function useAttachmentSocket(projectId: string | null) {
 
     const ws = new WebSocket(`ws://localhost:3333/ws?projectId=${projectId}`);
 
-    ws.onopen = () => console.log('WebSocket conectado, projectId:', projectId);
-    ws.onerror = (e) => console.error('WebSocket erro:', e);
-
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.event === 'attachment_scanned') {
-        console.log('Notificação recebida para taskId:', data.taskId);
-        
         removeScanningAttachment(data.taskId, data.attachmentId);
         addNotification({
           taskId: data.taskId,

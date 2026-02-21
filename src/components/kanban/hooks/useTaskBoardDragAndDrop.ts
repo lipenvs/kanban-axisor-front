@@ -152,7 +152,6 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
 
     let nextColumns = columns;
 
-    // Reordenação de colunas
     if (columns.some((c) => c.id === activeId)) {
       const activeIndex = columns.findIndex((c) => c.id === activeId);
       const overIndex = columns.findIndex((c) => c.id === overId);
@@ -174,9 +173,6 @@ export const useTaskBoardDragAndDrop = (initialData: ColumnType[]) => {
       return;
     }
 
-    // Reordenação de tasks
-    // Neste ponto o handleDragOver já moveu o card para a coluna de destino,
-    // então findColumn(activeId) retorna a coluna atual (destino), não a origem.
     const currentColumn = findColumn(activeId);
     const originColumnId = originColumnIdRef.current;
     const movedBetweenColumns = originColumnId !== null && originColumnId !== currentColumn?.id;
