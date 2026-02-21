@@ -1,4 +1,4 @@
-import { Bell, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+import { Bell, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import { useScanStore } from '@/hooks/useScanStore';
@@ -64,20 +64,28 @@ export function NotificationPopover() {
                                     <div className="flex items-center gap-2 pr-4">
                                         {n.status === 'clean' ? (
                                             <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                        ) : n.status === 'infected' ? (
-                                            <AlertCircle className="h-4 w-4 text-red-500" />
                                         ) : (
-                                            <XCircle className="h-4 w-4 text-gray-500" />
+                                            <AlertCircle className="h-4 w-4 text-red-500" />
                                         )}
-                                        <span className="text-xs font-semibold">
-                                            {n.status === 'clean' ? 'Arquivo seguro' : n.status === 'infected' ? 'Arquivo infectado!' : 'Erro no scan'}
-                                        </span>
-                                        <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                                        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                            <span className="text-xs font-semibold truncate" title={n.fileName}>
+                                                {n.fileName}
+                                            </span>
+                                            <span className={cn(
+                                                "text-[10px] font-medium uppercase tracking-wider",
+                                                n.status === 'clean' ? "text-green-600" : "text-red-600"
+                                            )}>
+                                                {n.status === 'clean' ? 'Verificado' : 'Perigo'}
+                                            </span>
+                                        </div>
+                                        <span className="ml-auto text-[10px] text-muted-foreground tabular-nums shrink-0">
                                             {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
                                     <p className="text-[11px] text-muted-foreground leading-relaxed pr-2">
-                                        O scan do anexo na tarefa foi concluído. {n.status === 'infected' && 'O arquivo foi removido por segurança.'}
+                                        {n.status === 'clean'
+                                            ? 'Nenhuma ameaça encontrada. O arquivo está seguro.'
+                                            : 'Vírus detectado! O arquivo foi removido por segurança.'}
                                     </p>
                                 </div>
                             ))}

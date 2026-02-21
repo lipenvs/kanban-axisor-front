@@ -4,6 +4,7 @@ interface Notification {
   id: string;
   taskId: string;
   attachmentId: string;
+  fileName: string;
   status: 'clean' | 'infected' | 'error';
   timestamp: number;
   read: boolean;

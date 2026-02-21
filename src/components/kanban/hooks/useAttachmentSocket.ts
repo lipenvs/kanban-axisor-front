@@ -21,6 +21,7 @@ export function useAttachmentSocket(projectId: string | null) {
         addNotification({
           taskId: data.taskId,
           attachmentId: data.attachmentId,
+          fileName: data.fileName,
           status: data.status,
         });
 
