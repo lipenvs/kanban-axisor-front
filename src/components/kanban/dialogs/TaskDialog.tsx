@@ -51,6 +51,7 @@ import {
 import type { GetAttachmentsByTaskId200 } from '@/lib/api/model/getAttachmentsByTaskId200'
 import type { GetAttachmentsByTaskId200AttachmentsItem } from '@/lib/api/model/getAttachmentsByTaskId200AttachmentsItem'
 import { useScanStore } from '@/hooks/useScanStore'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface LocalAttachment {
   id: string
@@ -475,16 +476,35 @@ export default function TaskDialog({
                         </span>
                       ) : (
                         <div className="shrink-0">
-                          {att.status === 'clean' ? (
-                            <ShieldCheck className="w-4 h-4 text-green-500" />
-                          ) : att.status === 'infected' || att.status === 'error' ? (
-                            <ShieldAlert className="w-4 h-4 text-red-500" />
-                          ) : (
-                            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
-                          )}
+                          <TooltipProvider>
+                            {att.status === 'clean' ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <ShieldCheck className="w-4 h-4 text-green-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>Arquivo verificado e seguro</TooltipContent>
+                              </Tooltip>
+                            ) : att.status === 'infected' ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <ShieldAlert className="w-4 h-4 text-red-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>Vírus detectado! O arquivo foi removido por segurança</TooltipContent>
+                              </Tooltip>
+                            ) : att.status === 'error' ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <ShieldAlert className="w-4 h-4 text-yellow-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>Não foi possível verificar a integridade do arquivo</TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                            )}
+                          </TooltipProvider>
                         </div>
                       )}
-                      <Button
+                      {att.status !== 'infected' && (<Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-muted-foreground hover:text-foreground cursor-pointer"
@@ -497,7 +517,7 @@ export default function TaskDialog({
                         >
                           <Download className="w-3.5 h-3.5" />
                         </a>
-                      </Button>
+                      </Button>)}
                       <Button
                         variant="ghost"
                         size="icon"
