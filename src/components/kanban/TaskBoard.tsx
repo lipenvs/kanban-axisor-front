@@ -22,6 +22,7 @@ import { useGetLabelsByProjectId } from "../../lib/api/label";
 import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 import { useAttachmentSocket } from "./hooks/useAttachmentSocket";
+import { useScanStore } from "@/hooks/useScanStore";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -112,10 +113,15 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
   };
 
   async function uploadFiles(taskId: string, files: File[]) {
+    const addScanningAttachment = useScanStore.getState().addScanningAttachment;
+
     await Promise.all(
-      files.map((file) =>
-        postAttachmentsUploadByTaskIdWithFormData(taskId, { file })
-      )
+      files.map(async (file) => {
+        const response = await postAttachmentsUploadByTaskIdWithFormData(taskId, { file });
+        if (response.data?.id) {
+          addScanningAttachment(taskId, response.data.id);
+        }
+      })
     );
     queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(taskId) });
   }

@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { getGetProjectsQueryKey, useGetProjects, usePutProjectsByIdWithJson, useDeleteProjectsById } from '@/lib/api/project'
 import TaskBoard from '@/components/kanban/TaskBoard'
+import { NotificationPopover } from '@/components/NotificationPopover'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_auth/tasks/$projectId')({
@@ -120,15 +121,17 @@ function TasksPage() {
           )}
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-destructive self-start sm:self-auto shrink-0"
-          onClick={() => setShowDeleteDialog(true)}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Excluir projeto
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-destructive"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Excluir projeto
+          </Button>
+        </div>
       </div>
 
       <TaskBoard projectId={projectId} labelId={labelId} searchQuery={search} />

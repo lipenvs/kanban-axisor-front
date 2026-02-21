@@ -1,8 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, Trash2, User, Paperclip } from "lucide-react";
+import { Calendar, Trash2, User, Paperclip, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useScanStore } from "@/hooks/useScanStore";
 
 import type { GetColumnsWithTasks200ItemCardsItem } from "../../lib/api/model/getColumnsWithTasks200ItemCardsItem";
 
@@ -15,6 +16,7 @@ interface CardProps {
 }
 
 const Card = ({ card, onDelete, onClick }: CardProps) => {
+  const isScanning = useScanStore((state) => state.scanningTaskIds.has(card.id));
   const { attributes, listeners, setNodeRef, transform, isDragging } = useSortable({
     id: card.id
   });
@@ -81,7 +83,11 @@ const Card = ({ card, onDelete, onClick }: CardProps) => {
           )}
 
           <span className="flex items-center gap-1 text-[12px]">
-            <Paperclip className="w-3 h-3" />
+            {isScanning ? (
+              <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
+            ) : (
+              <Paperclip className="w-3 h-3" />
+            )}
             {card.attachmentCount}
           </span>
         </div>

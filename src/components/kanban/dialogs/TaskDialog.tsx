@@ -53,6 +53,7 @@ import {
 import type { GetAttachmentsByTaskId200 } from '@/lib/api/model/getAttachmentsByTaskId200'
 import type { GetAttachmentsByTaskId200AttachmentsItem } from '@/lib/api/model/getAttachmentsByTaskId200AttachmentsItem'
 import { useQueryClient } from '@tanstack/react-query'
+import { useScanStore } from '@/hooks/useScanStore'
 
 interface LocalAttachment {
   id: string
@@ -100,6 +101,7 @@ export default function TaskDialog({
   onSubmit,
   isPending,
 }: TaskDialogProps) {
+  const scanningAttachmentIds = useScanStore((state) => state.scanningAttachmentIds)
   const [isDragOver, setIsDragOver] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
   const [uploadingAttachments] = useState<Map<string, { fileName: string; status: 'scanning' | 'saving' }>>(new Map())
@@ -465,6 +467,12 @@ export default function TaskDialog({
                         <ShieldAlert className="w-4 h-4 text-red-500" />
                       ) : (
                         <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                      )}
+                      {scanningAttachmentIds.has(att.id) && (
+                        <span className="text-[10px] text-blue-500 flex items-center gap-1 ml-1 font-medium bg-blue-50 px-1.5 py-0.5 rounded-full animate-pulse">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Escaneando...
+                        </span>
                       )}
                       <Button
                         variant="ghost"
