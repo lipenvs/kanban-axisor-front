@@ -114,7 +114,6 @@ A URL do WebSocket está fixa no código; em produção, use a mesma origem ou v
 ## Estilo e componentes
 
 - **Tailwind CSS** para utilitários e tema.
-- **Radix UI** para acessibilidade (modais, selects, etc.).
 - **Shadcn**: você pode adicionar componentes com `pnpm dlx shadcn@latest add <component>`.
 
 ## Documentação de design (Figma)
