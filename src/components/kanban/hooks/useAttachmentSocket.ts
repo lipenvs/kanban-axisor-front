@@ -22,7 +22,6 @@ export function useAttachmentSocket(projectId: string | null) {
       if (data.event === 'attachment_scanned') {
         console.log('Notificação recebida para taskId:', data.taskId);
         
-        // Atualiza o estado global
         removeScanningAttachment(data.taskId, data.attachmentId);
         addNotification({
           taskId: data.taskId,
@@ -38,7 +37,6 @@ export function useAttachmentSocket(projectId: string | null) {
           });
         }
 
-        // Invalida a query para atualizar a UI
         queryClient.invalidateQueries({
           queryKey: getGetAttachmentsByTaskIdQueryKey(data.taskId),
         });

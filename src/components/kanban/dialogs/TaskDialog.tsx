@@ -46,13 +46,10 @@ import type { GetColumnsWithTasks200ItemCardsItem } from '@/lib/api/model'
 import type { GetLabelsByProjectId200LabelsItem } from '@/lib/api/model'
 import {
   useGetAttachmentsByTaskId,
-  getGetAttachmentsByTaskIdQueryKey,
-  useDeleteAttachmentsById,
   getGetAttachmentsDownloadByIdUrl,
 } from '@/lib/api/attachment'
 import type { GetAttachmentsByTaskId200 } from '@/lib/api/model/getAttachmentsByTaskId200'
 import type { GetAttachmentsByTaskId200AttachmentsItem } from '@/lib/api/model/getAttachmentsByTaskId200AttachmentsItem'
-import { useQueryClient } from '@tanstack/react-query'
 import { useScanStore } from '@/hooks/useScanStore'
 
 interface LocalAttachment {
@@ -74,6 +71,7 @@ interface TaskDialogProps {
     labelId?: string | null
     assigneeId?: string | null
     files?: File[]
+    deletedAttachmentIds?: string[]
   }) => void
   isPending?: boolean
 }
@@ -105,24 +103,32 @@ export default function TaskDialog({
   const [isDragOver, setIsDragOver] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
   const [uploadingAttachments] = useState<Map<string, { fileName: string; status: 'scanning' | 'saving' }>>(new Map())
+  const [deletedAttachmentIds, setDeletedAttachmentIds] = useState<Set<string>>(new Set())
 
   const isEditing = !!task
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const queryClient = useQueryClient()
 
   const { data: existingAttachmentsData } = useGetAttachmentsByTaskId(
     task?.id ?? '',
     { query: { enabled: !!task?.id && open } },
   )
   const existingAttachments: GetAttachmentsByTaskId200AttachmentsItem[] =
-    (existingAttachmentsData?.data as GetAttachmentsByTaskId200 | undefined)?.attachments ?? []
+    ((existingAttachmentsData?.data as GetAttachmentsByTaskId200 | undefined)?.attachments ?? [])
+      .filter(att => !deletedAttachmentIds.has(att.id))
 
-  const { mutateAsync: deleteAttachment } = useDeleteAttachmentsById()
-
-  async function handleDeleteAttachment(attachmentId: string) {
-    await deleteAttachment({ id: attachmentId })
-    queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(task?.id ?? '') })
+  function handleDeleteAttachment(attachmentId: string) {
+    setDeletedAttachmentIds((prev) => {
+      const next = new Set(prev)
+      next.add(attachmentId)
+      return next
+    })
   }
+
+  useEffect(() => {
+    if (!open) {
+      setDeletedAttachmentIds(new Set())
+    }
+  }, [open])
 
   const { data: sessionData } = useQuery({
     queryKey: ['session'],
@@ -153,6 +159,7 @@ export default function TaskDialog({
         labelId: value.labelId || null,
         assigneeId: value.assigneeId || null,
         files: value.attachments.length > 0 ? value.attachments.map((a) => a.file) : undefined,
+        deletedAttachmentIds: deletedAttachmentIds.size > 0 ? Array.from(deletedAttachmentIds) : undefined,
       })
     },
   })

@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useGetColumnsWithTasks, usePostColumnsWithJson, getGetColumnsWithTasksQueryKey, useDeleteColumnsById, usePutColumnsByIdWithJson } from "../../lib/api/column";
 import { usePostTasksWithJson, useDeleteTasksById, usePutTasksByIdWithJson } from "../../lib/api/task";
 import { useGetLabelsByProjectId } from "../../lib/api/label";
-import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
+import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey, useDeleteAttachmentsById } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
 import { useAttachmentSocket } from "./hooks/useAttachmentSocket";
 import { useScanStore } from "@/hooks/useScanStore";
@@ -98,6 +98,8 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
   const { mutate: deleteTask } = useDeleteTasksById();
   const { mutate: updateTask } = usePutTasksByIdWithJson();
 
+  const { mutateAsync: deleteAttachmentAsync } = useDeleteAttachmentsById();
+
   const handleCreateColumn = (title: string) => {
     createColumn(
       { data: { title, projectId } },
@@ -126,7 +128,21 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
     queryClient.invalidateQueries({ queryKey: getGetAttachmentsByTaskIdQueryKey(taskId) });
   }
 
-  const handleCreateOrUpdateTask = (data: { title: string; description?: string; dueDate?: string | null; labelId?: string | null; assigneeId?: string | null; files?: File[] }) => {
+  async function deleteFiles(attachmentIds: string[]) {
+    await Promise.all(
+      attachmentIds.map((id) => deleteAttachmentAsync({ id }))
+    );
+  }
+
+  const handleCreateOrUpdateTask = (data: {
+    title: string;
+    description?: string;
+    dueDate?: string | null;
+    labelId?: string | null;
+    assigneeId?: string | null;
+    files?: File[];
+    deletedAttachmentIds?: string[];
+  }) => {
     if (editingTaskId) {
       updateTask(
         {
@@ -141,6 +157,9 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
         },
         {
           onSuccess: async () => {
+            if (data.deletedAttachmentIds && data.deletedAttachmentIds.length > 0) {
+              await deleteFiles(data.deletedAttachmentIds);
+            }
             if (data.files && data.files.length > 0) {
               await uploadFiles(editingTaskId, data.files);
             }
