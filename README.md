@@ -14,7 +14,7 @@ Interface da aplicação Kanban (Axisor), construída com **TanStack Start**, **
 - **Zustand** — estado global (ex.: notificações de scan de anexos)
 - **Better Auth** — autenticação (client)
 - **WebSocket** — atualizações em tempo real (status de anexos)
-- **Vitest** + **Testing Library** — testes unitários
+- **Vitest** + **Testing Library** — testes e2e
 
 ## Fluxo principal (frontend ↔ API)
 
