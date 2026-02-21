@@ -82,14 +82,17 @@ const Card = ({ card, onDelete, onClick }: CardProps) => {
             </span>
           )}
 
-          <span className="flex items-center gap-1 text-[12px]">
-            {isScanning ? (
-              <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
-            ) : (
+          {isScanning ? (
+            <span className="text-[10px] text-blue-500 flex items-center gap-1 font-medium bg-blue-50 px-1.5 py-0.5 rounded-full animate-pulse shrink-0">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Escaneando...
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-[12px]">
               <Paperclip className="w-3 h-3" />
-            )}
-            {card.attachmentCount}
-          </span>
+              {card.attachmentCount}
+            </span>
+          )}
         </div>
 
         <Avatar className="h-6 w-6">

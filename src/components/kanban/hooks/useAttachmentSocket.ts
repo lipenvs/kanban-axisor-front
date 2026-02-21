@@ -31,6 +31,8 @@ export function useAttachmentSocket(projectId: string | null) {
           toast.error('Anexo infectado detectado e removido!', {
             description: 'O arquivo foi excluído por segurança.',
           });
+        } else if (data.status === 'error') {
+          toast.warning('Não foi possível verificar a segurança do arquivo');
         }
 
         queryClient.invalidateQueries({

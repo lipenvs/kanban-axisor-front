@@ -64,6 +64,8 @@ export function NotificationPopover() {
                                     <div className="flex items-center gap-2 pr-4">
                                         {n.status === 'clean' ? (
                                             <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                        ) : n.status === 'error' ? (
+                                            <AlertCircle className="h-4 w-4 text-yellow-500" />
                                         ) : (
                                             <AlertCircle className="h-4 w-4 text-red-500" />
                                         )}
@@ -73,9 +75,9 @@ export function NotificationPopover() {
                                             </span>
                                             <span className={cn(
                                                 "text-[10px] font-medium uppercase tracking-wider",
-                                                n.status === 'clean' ? "text-green-600" : "text-red-600"
+                                                n.status === 'clean' ? "text-green-600" : n.status === 'error' ? "text-yellow-600" : "text-red-600"
                                             )}>
-                                                {n.status === 'clean' ? 'Verificado' : 'Perigo'}
+                                                {n.status === 'clean' ? 'Verificado' : n.status === 'error' ? 'Não verificado' : 'Perigo'}
                                             </span>
                                         </div>
                                         <span className="ml-auto text-[10px] text-muted-foreground tabular-nums shrink-0">
@@ -85,7 +87,9 @@ export function NotificationPopover() {
                                     <p className="text-[11px] text-muted-foreground leading-relaxed pr-2">
                                         {n.status === 'clean'
                                             ? 'Nenhuma ameaça encontrada. O arquivo está seguro.'
-                                            : 'Vírus detectado! O arquivo foi removido por segurança.'}
+                                            : n.status === 'error'
+                                                ? 'Não foi possível verificar a integridade do arquivo.'
+                                                : 'Vírus detectado! O arquivo foi removido por segurança.'}
                                     </p>
                                 </div>
                             ))}
