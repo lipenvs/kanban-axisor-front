@@ -249,7 +249,7 @@ export default function TaskDialog({
           <form.Field name="description">
             {(field) => (
               <Field>
-                <FieldLabel htmlFor="task-desc">Descricao</FieldLabel>
+                <FieldLabel htmlFor="task-desc">Descrição</FieldLabel>
                 <Textarea
                   id="task-desc"
                   value={field.state.value}
