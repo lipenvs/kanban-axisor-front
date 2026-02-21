@@ -1,3 +1,4 @@
+
 # Axisor Kanban — Frontend
 
 Interface da aplicação Kanban (Axisor), construída com **TanStack Start**, **Vite** e **React**.
@@ -118,10 +119,8 @@ A URL do WebSocket está fixa no código; em produção, use a mesma origem ou v
 
 ## Documentação de design (Figma)
 
-<!-- Link do Figma com processo de esboço e decisões de UI/UX -->
-**Figma (esboço e fluxos):** _[cole aqui o link do Figma]_
+**Figma (esboço e fluxos):** _[Figma do projeto (apenas para ter ideias)](https://www.figma.com/design/ac5kag9EbOqxXxyhrk5XXW/Axisor---Kanban?node-id=4011-3&t=Ns15oyktYfTqBxji-1)_
 
----
 
 ## Outros pontos
 
