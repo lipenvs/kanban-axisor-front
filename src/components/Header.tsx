@@ -1,7 +1,7 @@
 import { useNavigate, useRouterState, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { auth } from '../lib/auth'
-import { Search, LogOut, Settings, Plus, Menu } from 'lucide-react'
+import { Search, LogOut, Settings, Plus, Menu, X } from 'lucide-react'
 import { NotificationPopover } from './NotificationPopover'
 import { useState, useEffect, useMemo } from 'react'
 import { Input } from './ui/input'
@@ -30,6 +30,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddProject, setShowAddProject] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const { pathname, search: locationSearch } = useRouterState({
     select: (s) => ({
       pathname: s.location.pathname,
@@ -47,6 +48,10 @@ export default function Header() {
   useEffect(() => {
     setSearchQuery(urlSearchQuery)
   }, [urlSearchQuery])
+
+  useEffect(() => {
+    setMobileSearchOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     const projectId = params.projectId
@@ -83,59 +88,71 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 gap-3 shrink-0">
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden shrink-0"
-          >
-            <Menu className="w-5 h-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-[260px] border-none">
-          <SheetHeader className="sr-only">
-            <SheetTitle>Menu</SheetTitle>
-          </SheetHeader>
-          <Sidebar className="border-none" />
-        </SheetContent>
-      </Sheet>
+    <header className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-sm shrink-0">
+      <div className="h-16 flex items-center justify-between px-3 sm:px-4 md:px-6 gap-2">
 
-      {isTasksPage ? (
-        <div className="flex items-center gap-3 flex-1 max-w-md">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              placeholder="Buscar tarefas..."
-              className="pl-9 h-9 bg-muted/50 border-border/50"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden shrink-0"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-[260px] border-none">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <Sidebar className="border-none" />
+            </SheetContent>
+          </Sheet>
+
+          {isTasksPage && (
+            <div className="relative hidden sm:flex flex-1 max-w-xs lg:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="search"
+                placeholder="Buscar tarefas..."
+                className="pl-9 h-9 bg-muted/50 border-border/50 w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="flex-1 max-w-md" />
-      )}
 
-      <div className="flex items-center gap-2 md:gap-4">
-        <Button size="sm" onClick={() => setShowAddProject(true)} className="hidden sm:inline-flex">
-          <Plus className="w-4 h-4" />
-          <span className="hidden md:inline">Novo projeto</span>
-        </Button>
-        <Button size="icon" variant="outline" onClick={() => setShowAddProject(true)} className="sm:hidden">
-          <Plus className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
 
-        <div className="h-8 w-px bg-border/60 hidden md:block" />
+          {isTasksPage && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="sm:hidden shrink-0"
+              onClick={() => setMobileSearchOpen((v) => !v)}
+              aria-label="Buscar"
+            >
+              {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+            </Button>
+          )}
 
-        <div className="flex items-center gap-1 md:gap-2">
+          <Button size="sm" onClick={() => setShowAddProject(true)} className="hidden sm:inline-flex gap-1.5">
+            <Plus className="w-4 h-4" />
+            <span className="hidden md:inline">Novo projeto</span>
+          </Button>
+          <Button size="icon" variant="outline" onClick={() => setShowAddProject(true)} className="sm:hidden shrink-0">
+            <Plus className="w-4 h-4" />
+          </Button>
+
+          <div className="h-6 w-px bg-border/60 hidden sm:block mx-1" />
+
           <NotificationPopover />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full shrink-0">
                 <Avatar className="h-9 w-9">
                   <AvatarFallback className="bg-indigo-600 text-white text-xs font-semibold">
                     {data?.user?.name?.charAt(0) ?? 'U'}
@@ -145,27 +162,43 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <div className="px-3 py-2">
-                <p className="text-sm font-medium">
+                <p className="text-sm font-medium truncate">
                   {data?.user?.name ?? 'Usuário'}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground truncate">
                   {data?.user?.email ?? 'Email'}
                 </p>
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                <Settings className="w-4 h-4 mr-2" />
+                <Settings className="w-4 h-4 mr-2 shrink-0" />
                 Configurações
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-4 h-4 mr-2 shrink-0" />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {isTasksPage && mobileSearchOpen && (
+        <div className="sm:hidden px-3 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              placeholder="Buscar tarefas..."
+              className="pl-9 h-9 bg-muted/50 border-border/50 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+          </div>
+        </div>
+      )}
 
       <CreateProjectDialog
         open={showAddProject}

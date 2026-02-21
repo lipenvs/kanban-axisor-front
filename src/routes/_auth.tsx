@@ -33,7 +33,7 @@ function AuthLayout() {
     <div className="min-h-screen bg-background font-sans antialiased flex">
       <Sidebar className="hidden lg:flex fixed top-0 left-0 h-screen" />
 
-      <div className="flex-1 flex flex-col min-h-screen lg:ml-[260px] transition-all duration-300 ease-in-out">
+      <div className="flex-1 flex flex-col min-h-screen lg:ml-[260px] transition-all duration-300 ease-in-out min-w-0 overflow-hidden">
         <Header />
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           <Outlet />
