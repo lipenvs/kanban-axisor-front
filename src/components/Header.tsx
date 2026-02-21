@@ -15,12 +15,14 @@ import {
 import { Button } from './ui/button'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import { CreateProjectDialog } from './kanban/dialogs/CreateProjectDialog'
+import { SettingsDialog } from './kanban/dialogs/SettingsDialog'
 import { useSidebar } from './SidebarContext'
 
 export default function Header() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddProject, setShowAddProject] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const { toggle } = useSidebar()
   const { pathname, search: locationSearch } = useRouterState({
     select: (s) => ({
@@ -136,7 +138,7 @@ export default function Header() {
                 </p>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowSettings(true)}>
                 <Settings className="w-4 h-4 mr-2" />
                 Configurações
               </DropdownMenuItem>
@@ -153,6 +155,11 @@ export default function Header() {
       <CreateProjectDialog
         open={showAddProject}
         onOpenChange={setShowAddProject}
+      />
+
+      <SettingsDialog
+        open={showSettings}
+        onOpenChange={setShowSettings}
       />
     </header>
   )
