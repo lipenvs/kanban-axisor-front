@@ -11,7 +11,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Column from "./Column";
 import Card from "./Card";
 import ColumnDialog from "./ColumnDialog";
-import TaskDialog from "./TaskDialog";
+import TaskDialog from "./dialogs/TaskDialog";
 import { ConfirmDeleteDialog } from "../ConfirmDeleteDialog";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +21,7 @@ import { usePostTasksWithJson, useDeleteTasksById, usePutTasksByIdWithJson } fro
 import { useGetLabelsByProjectId } from "../../lib/api/label";
 import { postAttachmentsUploadByTaskIdWithFormData, getGetAttachmentsByTaskIdQueryKey } from "../../lib/api/attachment";
 import { useTaskBoardDragAndDrop } from "./hooks/useTaskBoardDragAndDrop";
+import { useAttachmentSocket } from "./hooks/useAttachmentSocket";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -39,6 +40,8 @@ interface TaskBoardProps {
 }
 
 export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoardProps) {
+  useAttachmentSocket(projectId);
+
   const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [createTaskColumnId, setCreateTaskColumnId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -55,7 +58,6 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
     const baseColumns = kanbanData?.data ?? [];
     let filtered = baseColumns;
 
-    // Filtrar por labelId
     if (labelId) {
       filtered = filtered.map((column) => ({
         ...column,
@@ -63,7 +65,6 @@ export default function TaskBoard({ projectId, labelId, searchQuery }: TaskBoard
       }));
     }
 
-    // Filtrar por searchQuery (título da tarefa)
     if (searchQuery?.trim()) {
       const query = searchQuery.trim().toLowerCase();
       filtered = filtered.map((column) => ({
