@@ -9,7 +9,7 @@ Interface da aplicação Kanban (Axisor), construída com **TanStack Start**, **
 - **TanStack Query** — cache e requisições (integrado ao cliente gerado pelo Orval)
 - **Orval** — geração do cliente HTTP e tipos a partir do OpenAPI da API
 - **Tailwind CSS** — estilos
-- **Radix UI** — componentes acessíveis (dialogs, dropdowns, etc.)
+- **Shadcn** — componentes acessíveis (dialogs, dropdowns, etc.)
 - **@dnd-kit** — drag and drop no quadro Kanban
 - **Zustand** — estado global (ex.: notificações de scan de anexos)
 - **Better Auth** — autenticação (client)
