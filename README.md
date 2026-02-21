@@ -88,7 +88,6 @@ A API deve estar rodando (ex.: `http://localhost:3333`) para login e dados. Para
 | `pnpm dev`           | Servidor de desenvolvimento (Vite)     |
 | `pnpm build`         | Build de produção                      |
 | `pnpm preview`       | Preview do build                       |
-| `pnpm test`          | Testes (Vitest)                        |
 | `pnpm run generate:api` | Gera cliente e tipos com Orval     |
 
 ## Orval
@@ -110,14 +109,6 @@ O hook `useAttachmentSocket(projectId)` conecta em `ws://localhost:3333/ws?proje
 - exibe toasts (Sonner) conforme o status: clean, infected ou error
 
 A URL do WebSocket está fixa no código; em produção, use a mesma origem ou variável de ambiente.
-
-## Testes
-
-Testes com **Vitest** e **Testing Library**:
-
-```bash
- pnpm test
-```
 
 ## Estilo e componentes
 
