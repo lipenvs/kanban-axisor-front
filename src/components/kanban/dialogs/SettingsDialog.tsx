@@ -23,10 +23,14 @@ interface SettingsDialogProps {
 const NAME_MIN_LENGTH = 2
 const NAME_MAX_LENGTH = 100
 
+import { useParams } from '@tanstack/react-router'
+import { getGetColumnsWithTasksQueryKey } from '@/lib/api/column'
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const queryClient = useQueryClient()
   const [isUpdating, setIsUpdating] = useState(false)
   const [name, setName] = useState('')
+  const params = useParams({ strict: false }) as { projectId?: string }
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -61,6 +65,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       if (error) throw error
 
       await queryClient.invalidateQueries({ queryKey: ['session'] })
+      // Invalida também as queries de colunas com tarefas para atualizar iniciais nos cards
+      if (params.projectId) {
+        await queryClient.invalidateQueries({ queryKey: getGetColumnsWithTasksQueryKey({ projectId: params.projectId }) })
+      }
       toast.success('Perfil atualizado com sucesso!')
       onOpenChange(false)
     } catch (err) {
